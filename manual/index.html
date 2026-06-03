@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RustFS Manual</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-2: #f59e0b;
+      --border: #334155;
+      --code: #0b1220;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0, #0f172a 46%, #020617 100%);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    header, main, footer {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+    header {
+      padding: 40px 0 20px;
+    }
+    h1, h2, h3 {
+      margin: 0 0 12px;
+      line-height: 1.15;
+    }
+    h1 { font-size: clamp(2rem, 4vw, 3.5rem); }
+    h2 { margin-top: 36px; font-size: 1.5rem; }
+    h3 { margin-top: 20px; font-size: 1.05rem; }
+    p { margin: 0 0 12px; color: var(--text); }
+    .lede { color: var(--muted); max-width: 75ch; }
+    .pill {
+      display: inline-block;
+      margin: 0 8px 8px 0;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.55);
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    .panel, details {
+      background: rgba(17, 24, 39, 0.88);
+      border: 1px solid rgba(51, 65, 85, 0.85);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+    }
+    .panel { padding: 20px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    details { padding: 14px 16px; margin: 14px 0; }
+    summary { cursor: pointer; font-weight: 700; color: #f8fafc; }
+    summary::marker { color: var(--accent); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.7);
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      color: #f8fafc;
+      background: rgba(30, 41, 59, 0.95);
+      font-weight: 700;
+    }
+    td { color: var(--text); }
+    tr:last-child td { border-bottom: 0; }
+    code, pre {
+      background: var(--code);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      border-radius: 10px;
+      color: #dbeafe;
+    }
+    code { padding: 2px 6px; }
+    pre {
+      overflow: auto;
+      padding: 14px;
+      margin: 12px 0;
+      white-space: pre-wrap;
+    }
+    .toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .toc a {
+      display: block;
+      color: var(--text);
+      text-decoration: none;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.65);
+    }
+    .toc a:hover { border-color: var(--accent); color: #fff; }
+    .small { color: var(--muted); font-size: 0.95rem; }
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    footer {
+      padding: 28px 0 40px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    .status {
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent-2);
+      background: rgba(245, 158, 11, 0.08);
+      border-radius: 12px;
+      color: #fef3c7;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <span class="pill">RustFS Manual</span>
+  <span class="pill">Multi-call command reference</span>
+  <h1>RustFS command manual</h1>
+  <p class="lede">
+    RustFS is a multi-call binary: the command name, symlink name, or applet name selects the tool to run.
+    This page gives a multi-call overview of the included applets, their purpose, and the main arguments
+    you are expected to use. It is meant as a quick reference for the current repository, not as a full POSIX
+    man-page replacement.
+  </p>
+  <div class="status">
+    Syntax note: bracketed items are optional, uppercase names are placeholders, and <code>...</code> means the item may be repeated.
+  </div>
+  <div class="toc">
+    <a href="#getting-started">Getting started</a>
+    <a href="#syntax">Command syntax</a>
+    <a href="#init">Init systems</a>
+    <a href="#device-manager">Device manager</a>
+    <a href="#core-utils">Core utilities</a>
+    <a href="#text">Text tools</a>
+    <a href="#system">System tools</a>
+    <a href="#network">Networking</a>
+    <a href="#archives">Archives and compression</a>
+    <a href="#disk">Disk and filesystem</a>
+    <a href="#ipc">IPC and logging</a>
+  </div>
+</header>
+<main>
+  <section id="getting-started" class="panel">
+    <h2>Getting Started</h2>
+    <p>Use RustFS in either of two ways:</p>
+    <pre><code># Multi-call mode
+rustfs ls -la /
+rustfs grep -n TODO src/
+
+# Symlink mode
+ln -s rustfs ls
+./ls -la /
+</code></pre>
+    <p class="small">
+      In symlink mode, the symlink name decides which applet runs. That is why this project behaves like a standard multi-call utility.
+    </p>
+  </section>
+
+  <section id="syntax" class="panel">
+    <h2>Command Syntax</h2>
+    <div class="grid">
+      <div>
+        <h3>Flags</h3>
+        <p>Most applet options begin with <code>-</code>. Short flags may be combined when the implementation allows it, for example <code>-cfk</code>.</p>
+      </div>
+      <div>
+        <h3>Arguments</h3>
+        <p>Uppercase words like <code>FILE</code>, <code>HOST</code>, or <code>DEVICE</code> are positional arguments. Fill them with real paths, hostnames, or device names.</p>
+      </div>
+      <div>
+        <h3>Lists</h3>
+        <p>Items ending in <code>...</code> accept more than one value, such as <code>FILE...</code> or <code>MODULE...</code>.</p>
+      </div>
+      <div>
+        <h3>Examples</h3>
+        <p>Examples below use the exact syntax that matches the current RustFS applets and their help text.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="init" class="panel">
+    <h2>Init Systems</h2>
+    <p>RustFS can be built with one of three init implementations. Only one is enabled at a time.</p>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>init</code></td><td>PID 1 entry point. The actual behavior depends on the selected init backend.</td><td><code>init [action]</code>, <code>init &lt;runlevel&gt;</code>, or <code>init --systemd [--target=TARGET]</code></td></tr>
+        <tr><td><code>sh</code></td><td>Interactive or script shell used by init and userspace.</td><td><code>sh [-c command] [-i] [script [args...]]</code></td></tr>
+        <tr><td><code>getty</code></td><td>Start a login prompt on a TTY.</td><td><code>getty [-n] [-l LOGIN] BAUD TTY [TERM]</code></td></tr>
+        <tr><td><code>login</code></td><td>Authenticate a user and start their shell.</td><td><code>login [-p] [USERNAME]</code></td></tr>
+        <tr><td><code>nohup</code></td><td>Run a command immune to hangup signals and terminal closure.</td><td><code>nohup COMMAND [ARG]...</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="device-manager" class="panel">
+    <h2>Device Manager</h2>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>mdev</code></td><td>Lightweight device manager for scanning <code>/sys</code>, populating <code>/dev</code>, and handling hotplug.</td><td>Common forms include <code>mdev -s</code> and <code>mdev -d</code></td></tr>
+        <tr><td><code>udevd</code></td><td>udev-compatible device manager daemon.</td><td>Starts as a service/daemon rather than as a one-shot command</td></tr>
+        <tr><td><code>udevadm</code></td><td>udev compatibility helper for inspecting devices.</td><td><code>udevadm info &lt;device_path&gt;</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="core-utils" class="panel">
+    <h2>Core Utilities</h2>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>cat</code></td><td>Print file contents to standard output.</td><td><code>cat [FILE]...</code></td></tr>
+        <tr><td><code>cp</code></td><td>Copy files and directories.</td><td>Commonly supports recursive and archive-style copies depending on the applet build.</td></tr>
+        <tr><td><code>mv</code></td><td>Move or rename files.</td><td>Typically accepts one or more sources followed by a destination.</td></tr>
+        <tr><td><code>rm</code></td><td>Remove files and directories.</td><td>Usually used with recursive and force flags for tree deletion.</td></tr>
+        <tr><td><code>mkdir</code></td><td>Create directories.</td><td>Typically supports parents and mode options.</td></tr>
+        <tr><td><code>rmdir</code></td><td>Remove empty directories.</td><td>Use on directory paths that are already empty.</td></tr>
+        <tr><td><code>ls</code></td><td>List directory contents.</td><td>Commonly used as <code>ls [-la] [PATH...]</code></td></tr>
+        <tr><td><code>touch</code></td><td>Create empty files or update timestamps.</td><td><code>touch [FILE]...</code></td></tr>
+        <tr><td><code>ln</code></td><td>Create hard or symbolic links.</td><td>Usually takes source and destination, with a symbolic-link mode.</td></tr>
+        <tr><td><code>chmod</code></td><td>Change permissions.</td><td>Pass a mode such as <code>755</code> and the target file list.</td></tr>
+        <tr><td><code>chgrp</code></td><td>Change group ownership.</td><td><code>chgrp [-Rv] GROUP FILE...</code></td></tr>
+        <tr><td><code>chown</code></td><td>Change owner or owner:group.</td><td><code>chown [-Rv] OWNER[:GROUP] FILE...</code></td></tr>
+        <tr><td><code>install</code></td><td>Copy files while also setting mode, owner, or directory creation.</td><td><code>install [-d] [-m MODE] [-o OWNER] [-g GROUP] SOURCE... DEST</code></td></tr>
+        <tr><td><code>less</code></td><td>Page through files.</td><td><code>less [file...]</code></td></tr>
+        <tr><td><code>head</code></td><td>Show the start of files.</td><td>Commonly <code>head [FILE]...</code> with a line-count flag.</td></tr>
+        <tr><td><code>tail</code></td><td>Show the end of files.</td><td>Commonly <code>tail [FILE]...</code> with line-count and follow modes.</td></tr>
+        <tr><td><code>tee</code></td><td>Copy stdin to files and stdout.</td><td>Usually <code>tee [FILE]...</code></td></tr>
+        <tr><td><code>wc</code></td><td>Count lines, words, and bytes.</td><td>Commonly supports the standard <code>-l</code>, <code>-w</code>, and <code>-c</code> style flags.</td></tr>
+        <tr><td><code>du</code></td><td>Estimate directory space usage.</td><td>Often used with recursive and human-readable options.</td></tr>
+        <tr><td><code>df</code></td><td>Report filesystem free space.</td><td>Shows mounted filesystems and capacity.</td></tr>
+        <tr><td><code>dd</code></td><td>Low-level byte copy and conversion tool.</td><td>Uses <code>if=</code>, <code>of=</code>, <code>bs=</code>, and similar operands.</td></tr>
+        <tr><td><code>stat</code></td><td>Show file metadata.</td><td>Prints size, mode, ownership, and timestamps.</td></tr>
+        <tr><td><code>readlink</code></td><td>Read a symlink target.</td><td>Often used with <code>-f</code> for canonical paths.</td></tr>
+        <tr><td><code>realpath</code></td><td>Resolve an absolute canonical path.</td><td>Useful for symlink-safe path resolution.</td></tr>
+        <tr><td><code>pwd</code></td><td>Print the current working directory.</td><td><code>pwd</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="text" class="panel">
+    <h2>Text Tools</h2>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>echo</code></td><td>Print arguments to standard output.</td><td><code>echo [ARG]...</code></td></tr>
+        <tr><td><code>printf</code></td><td>Format and print text.</td><td>First argument is a format string, followed by values.</td></tr>
+        <tr><td><code>grep</code></td><td>Search files or stdin for matching lines.</td><td>Pattern, flags, and optional files.</td></tr>
+        <tr><td><code>sed</code></td><td>Stream editor for substitutions and line transforms.</td><td>Script and optional file input.</td></tr>
+        <tr><td><code>sort</code></td><td>Sort lines.</td><td>Accepts common key, numeric, and reverse options.</td></tr>
+        <tr><td><code>uniq</code></td><td>Filter or count repeated adjacent lines.</td><td>Most useful when input is already sorted.</td></tr>
+        <tr><td><code>tr</code></td><td>Translate or delete characters.</td><td>Two character sets or deletion/ squeeze options.</td></tr>
+        <tr><td><code>cut</code></td><td>Select columns or byte ranges from input.</td><td>Often used with field separators and range flags.</td></tr>
+        <tr><td><code>paste</code></td><td>Merge lines from files.</td><td><code>paste [-d DELIM] [-s] [FILE]...</code></td></tr>
+        <tr><td><code>fold</code></td><td>Wrap long lines.</td><td>Typically supports width selection.</td></tr>
+        <tr><td><code>rev</code></td><td>Reverse each line of input.</td><td>File or stdin input.</td></tr>
+        <tr><td><code>nl</code></td><td>Number lines of input.</td><td>Works like <code>cat -n</code> with numbering controls.</td></tr>
+        <tr><td><code>awk</code></td><td>Pattern scanning and reporting language.</td><td><code>awk [-F sep] [-v var=val] 'program' [file...]</code></td></tr>
+        <tr><td><code>diff</code></td><td>Compare two files.</td><td><code>diff [-u] [-U NUM] FILE1 FILE2</code></td></tr>
+        <tr><td><code>dos2unix</code></td><td>Convert CRLF line endings to LF.</td><td><code>dos2unix [file...]</code></td></tr>
+        <tr><td><code>getopt</code></td><td>Parse command-line options in shell scripts.</td><td><code>getopt -o OPTSTRING [-l LONGOPTS] [-n NAME] -- PARAMS...</code></td></tr>
+        <tr><td><code>hd</code></td><td>Human-oriented hex dump helper.</td><td><code>hd [-n LENGTH] [file...]</code></td></tr>
+        <tr><td><code>hexdump</code></td><td>Hexadecimal and ASCII dump of binary data.</td><td><code>hexdump [-C] [-n LENGTH] [-s SKIP] [file...]</code></td></tr>
+        <tr><td><code>length</code></td><td>Report string length.</td><td>Useful in shell pipelines and scripts.</td></tr>
+    </tbody>
+    </table>
+  </section>
+
+  <section id="system" class="panel">
+    <h2>System Tools</h2>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>uname</code></td><td>Print system information.</td><td>Usually supports flags for kernel name, release, and machine.</td></tr>
+        <tr><td><code>hostname</code></td><td>Display or set the system hostname.</td><td>Pass a new name to change it.</td></tr>
+        <tr><td><code>whoami</code></td><td>Print the current username.</td><td><code>whoami</code></td></tr>
+        <tr><td><code>id</code></td><td>Show user and group IDs.</td><td>Often supports user and group selection.</td></tr>
+        <tr><td><code>uptime</code></td><td>Show system uptime and load average.</td><td><code>uptime</code></td></tr>
+        <tr><td><code>date</code></td><td>Show or set the current date and time.</td><td>Supports formatting and timestamp control.</td></tr>
+        <tr><td><code>env</code></td><td>Run a program with a modified environment.</td><td>Often used as <code>env NAME=value command</code></td></tr>
+        <tr><td><code>printenv</code></td><td>Print environment variables.</td><td><code>printenv [NAME]...</code></td></tr>
+        <tr><td><code>hostid</code></td><td>Print the host identifier.</td><td><code>hostid</code></td></tr>
+        <tr><td><code>logname</code></td><td>Print the login name of the current user.</td><td><code>logname</code></td></tr>
+        <tr><td><code>sleep</code></td><td>Pause for a time interval.</td><td><code>sleep NUMBER</code></td></tr>
+        <tr><td><code>yes</code></td><td>Repeatedly print a string until interrupted.</td><td><code>yes [STRING]</code></td></tr>
+        <tr><td><code>true</code></td><td>Exit successfully.</td><td><code>true</code></td></tr>
+        <tr><td><code>false</code></td><td>Exit with failure.</td><td><code>false</code></td></tr>
+        <tr><td><code>seq</code></td><td>Print a number sequence.</td><td>Common forms are <code>seq END</code> or <code>seq START END [STEP]</code></td></tr>
+        <tr><td><code>tty</code></td><td>Print the name of the current terminal.</td><td><code>tty</code></td></tr>
+        <tr><td><code>which</code></td><td>Locate an executable in <code>PATH</code>.</td><td><code>which PROGRAM...</code></td></tr>
+        <tr><td><code>xargs</code></td><td>Build and execute command lines from stdin.</td><td>Usually takes a base command plus arguments read from input.</td></tr>
+        <tr><td><code>find</code></td><td>Search for files in a directory tree.</td><td>Commonly used with path, name, and type tests.</td></tr>
+        <tr><td><code>test</code></td><td>Evaluate filesystem and string conditions.</td><td>Also available as <code>[</code> when installed as a symlink.</td></tr>
+        <tr><td><code>expr</code></td><td>Evaluate expressions.</td><td>Supports arithmetic, string, and comparison operations.</td></tr>
+        <tr><td><code>fuser</code></td><td>Show or kill processes using a file or mount.</td><td><code>fuser [-k] [-s SIGNAL] [-v] FILE...</code></td></tr>
+        <tr><td><code>getty</code></td><td>Spawn a login prompt on a serial console or TTY.</td><td><code>getty [-n] [-l LOGIN] BAUD TTY [TERM]</code></td></tr>
+        <tr><td><code>kill</code></td><td>Send a signal to processes.</td><td><code>kill [-s SIGNAL | -SIGNAL] PID...</code></td></tr>
+        <tr><td><code>killall</code></td><td>Send a signal to processes matching a name.</td><td><code>killall [-q] [-s SIGNAL] NAME...</code></td></tr>
+        <tr><td><code>last</code></td><td>Show login history.</td><td><code>last [-n NUM] [-f FILE]</code></td></tr>
+        <tr><td><code>logger</code></td><td>Send a message to syslog.</td><td><code>logger [-p PRIORITY] [-t TAG] [-s] MESSAGE...</code></td></tr>
+        <tr><td><code>logread</code></td><td>Read system log messages.</td><td><code>logread [-f]</code></td></tr>
+        <tr><td><code>klogd</code></td><td>Kernel log daemon.</td><td><code>klogd [-n] [-c LEVEL]</code></td></tr>
+        <tr><td><code>clear</code></td><td>Clear the terminal screen.</td><td><code>clear</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="network" class="panel">
+    <h2>Networking</h2>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>arp</code></td><td>Inspect or update the ARP table.</td><td>Used with interface and address operations.</td></tr>
+        <tr><td><code>arping</code></td><td>Send ARP requests to test reachability.</td><td><code>arping [-c count] [-I interface] [-w timeout] HOST</code></td></tr>
+        <tr><td><code>ftpd</code></td><td>Simple FTP server.</td><td><code>ftpd [-p PORT] [-w] [ROOT_DIR]</code></td></tr>
+        <tr><td><code>ftpget</code></td><td>Fetch a file from an FTP server.</td><td><code>ftpget [-u USER] [-p PASS] [-P PORT] HOST LOCAL REMOTE</code></td></tr>
+        <tr><td><code>ftpput</code></td><td>Upload a file to an FTP server.</td><td><code>ftpput [-u USER] [-p PASS] [-P PORT] HOST REMOTE LOCAL</code></td></tr>
+        <tr><td><code>httpd</code></td><td>Small HTTP server.</td><td><code>httpd [-f] [-p PORT] [-h HOME]</code></td></tr>
+        <tr><td><code>ifconfig</code></td><td>Configure network interfaces.</td><td>Usually supports address, netmask, and up/down settings.</td></tr>
+        <tr><td><code>ifdown</code></td><td>Bring an interface down.</td><td><code>ifdown [-a] [-f] IFACE...</code></td></tr>
+        <tr><td><code>ifup</code></td><td>Bring an interface up.</td><td><code>ifup [-a] IFACE...</code></td></tr>
+        <tr><td><code>ip</code></td><td>Network interface and routing control.</td><td><code>ip [OPTIONS] OBJECT { COMMAND }</code></td></tr>
+        <tr><td><code>ipaddr</code></td><td>Compatibility wrapper around IP address operations.</td><td>Address management helper.</td></tr>
+        <tr><td><code>ipcalc</code></td><td>Calculate network values from an address and prefix.</td><td><code>ipcalc [-bnp] [-m NETMASK] ADDRESS[/PREFIX]</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="archives" class="panel">
+    <h2>Archives and Compression</h2>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>ar</code></td><td>Create, list, or extract static archives.</td><td><code>ar [rcs|t|x] archive [files...]</code></td></tr>
+        <tr><td><code>bunzip2</code></td><td>Decompress bzip2 files.</td><td><code>bunzip2 [-cfk] [file...]</code></td></tr>
+        <tr><td><code>bzcat</code></td><td>Decompress bzip2 data to stdout.</td><td><code>bzcat [FILE]...</code></td></tr>
+        <tr><td><code>bzip2</code></td><td>Compress files with bzip2.</td><td><code>bzip2 [-cdkf123456789] [file...]</code></td></tr>
+        <tr><td><code>gunzip</code></td><td>Decompress gzip files.</td><td><code>gunzip [-cfk] [file...]</code></td></tr>
+        <tr><td><code>gzip</code></td><td>Compress files with gzip.</td><td><code>gzip [-cdfk123456789] [file...]</code></td></tr>
+        <tr><td><code>xxd</code></td><td>Hex dump / reverse hex dump utility.</td><td>Commonly used to display or recreate binary data.</td></tr>
+        <tr><td><code>base64</code></td><td>Base64 encode or decode data.</td><td>Usually supports encode/decode flags and stdin/stdout operation.</td></tr>
+        <tr><td><code>md5sum</code></td><td>Compute MD5 checksums.</td><td>Reads files or stdin and prints a digest.</td></tr>
+        <tr><td><code>sha256sum</code></td><td>Compute SHA-256 checksums.</td><td>Reads files or stdin and prints a digest.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="disk" class="panel">
+    <h2>Disk and Filesystem</h2>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>blkid</code></td><td>Show block device metadata and filesystem identifiers.</td><td><code>blkid [device...]</code></td></tr>
+        <tr><td><code>fdisk</code></td><td>Partition disk devices.</td><td><code>fdisk [-l] device</code></td></tr>
+        <tr><td><code>fsck</code></td><td>Check and repair filesystems.</td><td><code>fsck [-anpvy] [-t fstype] device...</code></td></tr>
+        <tr><td><code>fsync</code></td><td>Flush file contents and metadata to disk.</td><td><code>fsync [-d] FILE...</code></td></tr>
+        <tr><td><code>hwclock</code></td><td>Read or set the hardware clock.</td><td><code>hwclock [-r|-w|-s] [-u|-l]</code></td></tr>
+        <tr><td><code>losetup</code></td><td>Attach or detach loop devices.</td><td><code>losetup [-d DEVICE] [-D] [-f] [-r] [-o OFFSET] [DEVICE] [FILE]</code></td></tr>
+        <tr><td><code>mount</code></td><td>Mount filesystems.</td><td><code>mount [-t type] [-o options] [-r] [-w] [device] [mountpoint]</code></td></tr>
+        <tr><td><code>umount</code></td><td>Unmount filesystems.</td><td><code>umount [-f] [-l] [-r] [-a [-t type]] [target...]</code></td></tr>
+        <tr><td><code>insmod</code></td><td>Insert a kernel module.</td><td><code>insmod MODULE [params...]</code></td></tr>
+        <tr><td><code>lsmod</code></td><td>Show loaded kernel modules.</td><td>Outputs the current module list.</td></tr>
+        <tr><td><code>modinfo</code></td><td>Show kernel module metadata.</td><td><code>modinfo [-F field] MODULE...</code></td></tr>
+        <tr><td><code>modprobe</code></td><td>Load or remove kernel modules with dependency handling.</td><td><code>modprobe [-r] [-v] [-n] [-q] MODULE [params...]</code></td></tr>
+        <tr><td><code>rmmod</code></td><td>Remove a kernel module.</td><td><code>rmmod [-f] [-w] MODULE...</code></td></tr>
+        <tr><td><code>depmod</code></td><td>Generate kernel module dependency information.</td><td><code>depmod [-a] [-b basedir] [-n] [version]</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="ipc" class="panel">
+    <h2>IPC and Logging</h2>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>ipcrm</code></td><td>Remove SysV IPC objects.</td><td><code>ipcrm [-m shmid] [-q msqid] [-s semid] [-M shmkey] [-Q msgkey] [-S semkey]</code></td></tr>
+        <tr><td><code>ipcs</code></td><td>Show SysV IPC status.</td><td><code>ipcs [-amqs]</code></td></tr>
+        <tr><td><code>logger</code></td><td>Send messages to the system log.</td><td><code>logger [-p PRIORITY] [-t TAG] [-s] MESSAGE...</code></td></tr>
+        <tr><td><code>logread</code></td><td>Read the log buffer or syslog output.</td><td><code>logread [-f]</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>Other Included Applets</h2>
+    <p class="small">The following applets are included in the current rootfs image and behave like standard multi-call utilities as well:</p>
+    <div class="two-col">
+      <div>
+        <h3>User and Group Management</h3>
+        <p><code>addgroup</code> - <code>addgroup [-g GID] [-S] GROUP</code></p>
+        <p><code>adduser</code> - <code>adduser [-u UID] [-g GID] [-h HOME] [-s SHELL] [-S] [-H] [-D] USER</code></p>
+        <p><code>delgroup</code> - <code>delgroup GROUP</code></p>
+        <p><code>deluser</code> - <code>deluser [--remove-home] USER</code></p>
+      </div>
+      <div>
+        <h3>Process and Service Helpers</h3>
+        <p><code>halt</code>, <code>poweroff</code>, <code>reboot</code>, <code>kill</code>, <code>killall</code>, <code>last</code>, <code>login</code>, <code>getty</code>, <code>nohup</code></p>
+      </div>
+      <div>
+        <h3>Networking Helpers</h3>
+        <p><code>arp</code>, <code>arping</code>, <code>ifconfig</code>, <code>ifdown</code>, <code>ifup</code>, <code>ip</code>, <code>ipaddr</code>, <code>ipcalc</code>, <code>ftpd</code>, <code>ftpget</code>, <code>ftpput</code>, <code>httpd</code></p>
+      </div>
+      <div>
+        <h3>Formatting and Console Helpers</h3>
+        <p><code>clear</code>, <code>hd</code>, <code>hexdump</code>, <code>paste</code>, <code>rev</code>, <code>fold</code>, <code>length</code>, <code>which</code>, <code>xargs</code>, <code>yes</code>, <code>seq</code>, <code>tty</code></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>How To Read Arguments</h2>
+    <div class="grid">
+      <div>
+        <h3>Single dash options</h3>
+        <p><code>-v</code> usually means verbose, <code>-q</code> quiet, <code>-f</code> force, <code>-r</code> recursive or read-only depending on the command.</p>
+      </div>
+      <div>
+        <h3>Repeated arguments</h3>
+        <p>If the synopsis shows <code>FILE...</code>, pass as many files as needed. The same applies to <code>MODULE...</code>, <code>PID...</code>, and similar groups.</p>
+      </div>
+      <div>
+        <h3>Shell redirection</h3>
+        <p>RustFS shell supports standard redirection forms such as <code>&gt;</code>, <code>&gt;&gt;</code>, <code>&lt;</code>, <code>2&gt;</code>, <code>2&gt;&gt;</code>, and <code>2&gt;&amp;1</code>.</p>
+      </div>
+      <div>
+        <h3>Pipelines</h3>
+        <p>Commands can be chained with pipes, and output redirection on a pipe segment is supported in the shell implementation.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  RustFS manual page generated for the current repository state. For exact behavior, prefer the inline help shown by each applet when available.
+</footer>
+</body>
+</html>

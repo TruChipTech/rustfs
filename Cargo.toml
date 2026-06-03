@@ -1,0 +1,71 @@
+# <purpose of file>
+#
+# Copyright (C) 2026 by Anandkumar  <Truchip >
+#
+# Licensed under MIT
+[package]
+name = "rustfs"
+version = "0.1.0"
+edition = "2021"
+description = "Rust-based rootfs utilities — safe, correct, and fast"
+license = "MIT"
+
+[lints.rust]
+unexpected_cfgs = { level = "allow", check-cfg = [
+    'cfg(init)', 'cfg(init_rustfs)', 'cfg(init_sysvinit)', 'cfg(init_systemd)',
+    'cfg(mdev)', 'cfg(udev)',
+    'cfg(applet_cat)', 'cfg(applet_cp)', 'cfg(applet_mv)', 'cfg(applet_rm)',
+    'cfg(applet_mkdir)', 'cfg(applet_rmdir)', 'cfg(applet_ls)', 'cfg(applet_touch)',
+    'cfg(applet_ln)', 'cfg(applet_chmod)', 'cfg(applet_head)', 'cfg(applet_tail)',
+    'cfg(applet_tee)', 'cfg(applet_wc)', 'cfg(applet_du)', 'cfg(applet_df)',
+    'cfg(applet_stat)', 'cfg(applet_readlink)', 'cfg(applet_echo)', 'cfg(applet_printf)',
+    'cfg(applet_grep)', 'cfg(applet_sed)', 'cfg(applet_sort)', 'cfg(applet_uniq)',
+    'cfg(applet_tr)', 'cfg(applet_cut)', 'cfg(applet_paste)', 'cfg(applet_fold)',
+    'cfg(applet_rev)', 'cfg(applet_nl)', 'cfg(applet_basename)', 'cfg(applet_dirname)',
+    'cfg(applet_pwd)', 'cfg(applet_realpath)', 'cfg(applet_base64)', 'cfg(applet_md5sum)',
+    'cfg(applet_sha256sum)', 'cfg(applet_xxd)', 'cfg(applet_uname)', 'cfg(applet_hostname)',
+    'cfg(applet_whoami)', 'cfg(applet_id)', 'cfg(applet_uptime)', 'cfg(applet_date)',
+    'cfg(applet_env)', 'cfg(applet_printenv)', 'cfg(applet_sleep)', 'cfg(applet_yes)',
+    'cfg(applet_true)', 'cfg(applet_false)', 'cfg(applet_nohup)', 'cfg(applet_seq)',
+    'cfg(applet_tty)', 'cfg(applet_which)', 'cfg(applet_xargs)', 'cfg(applet_find)',
+    'cfg(applet_test)', 'cfg(applet_expr)',
+    'cfg(applet_addgroup)', 'cfg(applet_adduser)', 'cfg(applet_ar)', 'cfg(applet_arp)',
+    'cfg(applet_arping)', 'cfg(applet_awk)', 'cfg(applet_blkid)', 'cfg(applet_bunzip2)',
+    'cfg(applet_bzcat)', 'cfg(applet_bzip2)', 'cfg(applet_chgrp)', 'cfg(applet_chown)',
+    'cfg(applet_clear)', 'cfg(applet_dd)', 'cfg(applet_delgroup)', 'cfg(applet_deluser)',
+    'cfg(applet_diff)', 'cfg(applet_dmesg)', 'cfg(applet_dos2unix)', 'cfg(applet_fbset)',
+    'cfg(applet_fdisk)', 'cfg(applet_fsck)',
+    'cfg(applet_fsync)', 'cfg(applet_ftpd)', 'cfg(applet_ftpget)', 'cfg(applet_ftpput)',
+    'cfg(applet_fuser)', 'cfg(applet_getopt)', 'cfg(applet_getty)', 'cfg(applet_gunzip)',
+    'cfg(applet_gzip)', 'cfg(applet_hd)', 'cfg(applet_hexdump)', 'cfg(applet_hostid)',
+    'cfg(applet_httpd)', 'cfg(applet_hwclock)', 'cfg(applet_ifconfig)', 'cfg(applet_ifdown)',
+    'cfg(applet_ifup)', 'cfg(applet_insmod)', 'cfg(applet_install)', 'cfg(applet_ip)',
+    'cfg(applet_ipaddr)', 'cfg(applet_ipcalc)', 'cfg(applet_ipcrm)', 'cfg(applet_ipcs)',
+    'cfg(applet_kill)', 'cfg(applet_killall)', 'cfg(applet_klogd)', 'cfg(applet_last)',
+    'cfg(applet_length)', 'cfg(applet_less)', 'cfg(applet_logger)', 'cfg(applet_login)',
+    'cfg(applet_logname)', 'cfg(applet_logread)', 'cfg(applet_losetup)', 'cfg(applet_lsmod)',
+    'cfg(applet_mount)', 'cfg(applet_umount)', 'cfg(applet_rmmod)',
+    'cfg(applet_depmod)', 'cfg(applet_modprobe)', 'cfg(applet_modinfo)',
+    'cfg(applet_sh)',
+] }
+
+[dependencies]
+chrono = "0.4"
+glob = "0.3"
+regex = "1"
+libc = "0.2"
+base64 = "0.22"
+sha2 = "0.10"
+md-5 = "0.10"
+walkdir = "2"
+bzip2 = "0.5"
+
+[target.'cfg(unix)'.dependencies]
+nix = { version = "0.29", features = ["fs", "process", "signal", "user", "hostname", "net"] }
+users = "0.11"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+panic = "abort"

@@ -1,0 +1,600 @@
+# <purpose of file>
+#
+# Copyright (C) 2026 by Anandkumar  <Truchip >
+#
+# Licensed under MIT
+mainmenu "RustFS Configuration"
+
+menu "Init System"
+
+config INIT
+    bool "Enable init applet"
+    default y
+    help
+      Enable the init applet, allowing RustFS to serve as PID 1
+      (the first userspace process started by the Linux kernel).
+
+choice
+    prompt "Init system type"
+    depends on INIT
+    default INIT_RUSTFS
+
+config INIT_RUSTFS
+    bool "RustFS init (simple init)"
+    help
+      Simple, lightweight init similar in spirit to minimal init
+      implementations. Reads /etc/inittab, manages process spawning
+      and respawning, mounts essential filesystems, and runs
+      rc scripts. Ideal for embedded systems and containers.
+
+config INIT_SYSVINIT
+    bool "System V init"
+    help
+      Full System V init support. Parses /etc/inittab and manages
+      runlevels (0-6, S). Supports respawn, wait, once, sysinit,
+      boot, bootwait, ctrlaltdel, shutdown, and restart actions.
+      Provides telinit functionality for runlevel switching.
+
+config INIT_SYSTEMD
+    bool "systemd-compatible init"
+    help
+      systemd-compatible init. Parses .service unit files from
+      /etc/systemd/system/ and /usr/lib/systemd/system/.
+      Supports Type=simple, forking, oneshot. Handles ExecStart,
+      ExecStop, Restart, WantedBy, After, and Requires directives.
+      Resolves service dependencies and starts them in order.
+
+endchoice
+
+endmenu
+
+menu "Device Manager"
+
+config MDEV
+    bool "mdev — lightweight device manager"
+    default y
+    help
+      Lightweight device manager that handles hotplug events from
+      the kernel via /sys. Reads /etc/mdev.conf for device node
+      creation rules (permissions, ownership, symlinks, scripts).
+      Suitable for embedded systems and minimal rootfs setups.
+
+config UDEV
+    bool "udev — full device manager"
+    default n
+    help
+      udev-compatible device manager. Listens on a netlink socket
+      for kernel uevents and creates/removes device nodes in /dev.
+      Reads rules from /etc/udev/rules.d/ and /usr/lib/udev/rules.d/.
+      Supports SUBSYSTEM, KERNEL, ATTR, SYMLINK, RUN, MODE, OWNER,
+      GROUP, and ENV matching/assignment keys.
+
+endmenu
+
+menu "File Operations"
+
+config APPLET_CAT
+    bool "cat"
+    default y
+
+config APPLET_CP
+    bool "cp"
+    default y
+
+config APPLET_MV
+    bool "mv"
+    default y
+
+config APPLET_RM
+    bool "rm"
+    default y
+
+config APPLET_MKDIR
+    bool "mkdir"
+    default y
+
+config APPLET_RMDIR
+    bool "rmdir"
+    default y
+
+config APPLET_LS
+    bool "ls"
+    default y
+
+config APPLET_TOUCH
+    bool "touch"
+    default y
+
+config APPLET_LN
+    bool "ln"
+    default y
+
+config APPLET_CHMOD
+    bool "chmod"
+    default y
+
+config APPLET_HEAD
+    bool "head"
+    default y
+
+config APPLET_TAIL
+    bool "tail"
+    default y
+
+config APPLET_TEE
+    bool "tee"
+    default y
+
+config APPLET_WC
+    bool "wc"
+    default y
+
+config APPLET_DU
+    bool "du"
+    default y
+
+config APPLET_DF
+    bool "df"
+    default y
+
+config APPLET_STAT
+    bool "stat"
+    default y
+
+config APPLET_READLINK
+    bool "readlink"
+    default y
+
+config APPLET_CHGRP
+    bool "chgrp"
+    default y
+
+config APPLET_CHOWN
+    bool "chown"
+    default y
+
+config APPLET_DD
+    bool "dd"
+    default y
+
+endmenu
+
+menu "Text Processing"
+
+config APPLET_ECHO
+    bool "echo"
+    default y
+
+config APPLET_PRINTF
+    bool "printf"
+    default y
+
+config APPLET_GREP
+    bool "grep"
+    default y
+
+config APPLET_SED
+    bool "sed"
+    default y
+
+config APPLET_SORT
+    bool "sort"
+    default y
+
+config APPLET_UNIQ
+    bool "uniq"
+    default y
+
+config APPLET_TR
+    bool "tr"
+    default y
+
+config APPLET_CUT
+    bool "cut"
+    default y
+
+config APPLET_PASTE
+    bool "paste"
+    default y
+
+config APPLET_FOLD
+    bool "fold"
+    default y
+
+config APPLET_REV
+    bool "rev"
+    default y
+
+config APPLET_NL
+    bool "nl"
+    default y
+
+config APPLET_AWK
+    bool "awk"
+    default y
+
+config APPLET_DIFF
+    bool "diff"
+    default y
+
+config APPLET_DOS2UNIX
+    bool "dos2unix"
+    default y
+
+endmenu
+
+menu "Path / String"
+
+config APPLET_BASENAME
+    bool "basename"
+    default y
+
+config APPLET_DIRNAME
+    bool "dirname"
+    default y
+
+config APPLET_PWD
+    bool "pwd"
+    default y
+
+config APPLET_REALPATH
+    bool "realpath"
+    default y
+
+endmenu
+
+menu "Encoding / Hashing"
+
+config APPLET_BASE64
+    bool "base64"
+    default y
+
+config APPLET_MD5SUM
+    bool "md5sum"
+    default y
+
+config APPLET_SHA256SUM
+    bool "sha256sum"
+    default y
+
+config APPLET_XXD
+    bool "xxd"
+    default y
+
+endmenu
+
+menu "System Info"
+
+config APPLET_UNAME
+    bool "uname"
+    default y
+
+config APPLET_HOSTNAME
+    bool "hostname"
+    default y
+
+config APPLET_WHOAMI
+    bool "whoami"
+    default y
+
+config APPLET_ID
+    bool "id"
+    default y
+
+config APPLET_UPTIME
+    bool "uptime"
+    default y
+
+config APPLET_DATE
+    bool "date"
+    default y
+
+config APPLET_ENV
+    bool "env"
+    default y
+
+config APPLET_PRINTENV
+    bool "printenv"
+    default y
+
+endmenu
+
+menu "Process / Misc"
+
+config APPLET_SLEEP
+    bool "sleep"
+    default y
+
+config APPLET_YES
+    bool "yes"
+    default y
+
+config APPLET_TRUE
+    bool "true"
+    default y
+
+config APPLET_FALSE
+    bool "false"
+    default y
+
+config APPLET_NOHUP
+    bool "nohup"
+    default y
+
+config APPLET_SEQ
+    bool "seq"
+    default y
+
+config APPLET_TTY
+    bool "tty"
+    default y
+
+config APPLET_WHICH
+    bool "which"
+    default y
+
+config APPLET_XARGS
+    bool "xargs"
+    default y
+
+config APPLET_FIND
+    bool "find"
+    default y
+
+config APPLET_TEST
+    bool "test"
+    default y
+
+config APPLET_EXPR
+    bool "expr"
+    default y
+
+config APPLET_FUSER
+    bool "fuser"
+    default y
+
+config APPLET_GETTY
+    bool "getty"
+    default y
+
+config APPLET_GETOPT
+    bool "getopt"
+    default y
+
+config APPLET_KILL
+    bool "kill"
+    default y
+
+config APPLET_KILLALL
+    bool "killall"
+    default y
+
+config APPLET_LAST
+    bool "last"
+    default y
+
+config APPLET_LENGTH
+    bool "length"
+    default y
+
+config APPLET_LESS
+    bool "less"
+    default y
+
+config APPLET_LOGGER
+    bool "logger"
+    default y
+
+config APPLET_LOGIN
+    bool "login"
+    default y
+
+config APPLET_LOGNAME
+    bool "logname"
+    default y
+
+config APPLET_LOGREAD
+    bool "logread"
+    default y
+
+config APPLET_IPCRM
+    bool "ipcrm"
+    default y
+
+config APPLET_IPCS
+    bool "ipcs"
+    default y
+
+endmenu
+
+menu "User / Group Management"
+
+config APPLET_ADDGROUP
+    bool "addgroup"
+    default y
+
+config APPLET_ADDUSER
+    bool "adduser"
+    default y
+
+config APPLET_DELGROUP
+    bool "delgroup"
+    default y
+
+config APPLET_DELUSER
+    bool "deluser"
+    default y
+
+endmenu
+
+menu "Networking"
+
+config APPLET_ARP
+    bool "arp"
+    default y
+
+config APPLET_ARPING
+    bool "arping"
+    default y
+
+config APPLET_FTPD
+    bool "ftpd"
+    default y
+
+config APPLET_FTPGET
+    bool "ftpget"
+    default y
+
+config APPLET_FTPPUT
+    bool "ftpput"
+    default y
+
+config APPLET_HTTPD
+    bool "httpd"
+    default y
+
+config APPLET_IFCONFIG
+    bool "ifconfig"
+    default y
+
+config APPLET_IFDOWN
+    bool "ifdown"
+    default y
+
+config APPLET_IFUP
+    bool "ifup"
+    default y
+
+config APPLET_IP
+    bool "ip"
+    default y
+
+config APPLET_IPADDR
+    bool "ipaddr"
+    default y
+
+config APPLET_IPCALC
+    bool "ipcalc"
+    default y
+
+endmenu
+
+menu "Archive / Compression"
+
+config APPLET_AR
+    bool "ar"
+    default y
+
+config APPLET_BUNZIP2
+    bool "bunzip2"
+    default y
+
+config APPLET_BZCAT
+    bool "bzcat"
+    default y
+
+config APPLET_BZIP2
+    bool "bzip2"
+    default y
+
+config APPLET_GUNZIP
+    bool "gunzip"
+    default y
+
+config APPLET_GZIP
+    bool "gzip"
+    default y
+
+endmenu
+
+menu "Disk / System Utilities"
+
+config APPLET_BLKID
+    bool "blkid"
+    default y
+
+config APPLET_CLEAR
+    bool "clear"
+    default y
+
+config APPLET_DMESG
+    bool "dmesg"
+    default y
+
+config APPLET_FBSET
+    bool "fbset"
+    default y
+
+config APPLET_FDISK
+    bool "fdisk"
+    default y
+
+config APPLET_FSCK
+    bool "fsck"
+    default y
+
+config APPLET_FSYNC
+    bool "fsync"
+    default y
+
+config APPLET_HWCLOCK
+    bool "hwclock"
+    default y
+
+config APPLET_INSMOD
+    bool "insmod"
+    default y
+
+config APPLET_INSTALL
+    bool "install"
+    default y
+
+config APPLET_KLOGD
+    bool "klogd"
+    default y
+
+config APPLET_LOSETUP
+    bool "losetup"
+    default y
+
+config APPLET_LSMOD
+    bool "lsmod"
+    default y
+
+config APPLET_MOUNT
+    bool "mount"
+    default y
+
+config APPLET_UMOUNT
+    bool "umount"
+    default y
+
+config APPLET_RMMOD
+    bool "rmmod"
+    default y
+
+config APPLET_DEPMOD
+    bool "depmod"
+    default y
+
+config APPLET_MODPROBE
+    bool "modprobe"
+    default y
+
+config APPLET_MODINFO
+    bool "modinfo"
+    default y
+
+config APPLET_HD
+    bool "hd"
+    default y
+
+config APPLET_HEXDUMP
+    bool "hexdump"
+    default y
+
+config APPLET_HOSTID
+    bool "hostid"
+    default y
+
+endmenu
