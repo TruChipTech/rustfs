@@ -5,6 +5,26 @@
 # Licensed under MIT
 mainmenu "RustFS Configuration"
 
+menu "Build Options"
+
+config STATIC
+    bool "Build statically linked binary (musl)"
+    default y
+    help
+      Build a fully static binary using the musl libc target
+      (x86_64-unknown-linux-musl). The resulting binary has zero
+      shared-library dependencies and is suitable for initramfs
+      images and embedded systems.
+
+      Requires the Rust musl target and musl-tools:
+        rustup target add x86_64-unknown-linux-musl
+        apt install musl-tools
+
+      When disabled, a standard dynamically-linked glibc binary
+      is produced instead.
+
+endmenu
+
 menu "Init System"
 
 config INIT
@@ -596,5 +616,86 @@ config APPLET_HEXDUMP
 config APPLET_HOSTID
     bool "hostid"
     default y
+
+endmenu
+
+menu "Process / System Utilities"
+
+config APPLET_PS
+    bool "ps — list running processes"
+    default y
+    help
+      Display information about running processes, reading from /proc.
+      Supports -e/-A (all processes), -f (full format), -u (user format).
+
+config APPLET_FREE
+    bool "free — display memory usage"
+    default y
+    help
+      Show total/used/free memory and swap from /proc/meminfo.
+      Supports -h (human), -b/-k/-m/-g (unit), -w (wide).
+
+config APPLET_SYNC
+    bool "sync — flush filesystem buffers"
+    default y
+    help
+      Write all pending filesystem data to disk (calls the sync syscall).
+
+config APPLET_MKTEMP
+    bool "mktemp — create temporary file or directory"
+    default y
+    help
+      Create unique temporary files or directories.
+      Supports -d (directory), -p DIR (base directory), --suffix=SUFFIX.
+
+config APPLET_NPROC
+    bool "nproc — print number of processors"
+    default y
+    help
+      Print the number of available processing units.
+      Supports --all (total, not just online), --ignore=N.
+
+config APPLET_TAC
+    bool "tac — reverse cat (print lines in reverse order)"
+    default y
+    help
+      Concatenate and print files in reverse line order.
+
+config APPLET_TIMEOUT
+    bool "timeout — run command with time limit"
+    default y
+    help
+      Start COMMAND and kill it if it runs longer than DURATION.
+      Supports -s SIGNAL, --preserve-status, --kill-after=DURATION.
+      Exit code 124 if the command timed out.
+
+config APPLET_OD
+    bool "od — octal/hex dump"
+    default y
+    help
+      Dump files in various formats (octal, hex, decimal, ASCII).
+      Supports -b -c -d -o -x, -t TYPE, -A RADIX, -N COUNT, -j SKIP.
+
+config APPLET_TRUNCATE
+    bool "truncate — shrink or extend file size"
+    default y
+    help
+      Set file length to SIZE bytes (creating the file if needed).
+      Supports -s SIZE (with K/M/G suffixes and +/-/</> modifiers),
+      -c (do not create), -r FILE (reference file).
+
+config APPLET_STRINGS
+    bool "strings — print printable strings from binary files"
+    default y
+    help
+      Search binary files for sequences of printable characters.
+      Supports -n MIN (minimum length, default 4), -t RADIX (print offset).
+
+config APPLET_CMP
+    bool "cmp — compare two files byte by byte"
+    default y
+    help
+      Compare two files and report the first differing byte.
+      Supports -l (list all differences), -s (silent, exit code only).
 
 endmenu

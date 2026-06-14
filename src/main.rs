@@ -313,6 +313,30 @@ fn main() {
         #[cfg(applet_sh)]
         "sh" | "ash" => applets::sh::run(&applet_args),
 
+        // New applets (BusyBox parity)
+        #[cfg(applet_ps)]
+        "ps" => applets::ps::run(&applet_args),
+        #[cfg(applet_free)]
+        "free" => applets::free::run(&applet_args),
+        #[cfg(applet_sync)]
+        "sync" => applets::sync::run(&applet_args),
+        #[cfg(applet_mktemp)]
+        "mktemp" => applets::mktemp::run(&applet_args),
+        #[cfg(applet_nproc)]
+        "nproc" => applets::nproc::run(&applet_args),
+        #[cfg(applet_tac)]
+        "tac" => applets::tac::run(&applet_args),
+        #[cfg(applet_timeout)]
+        "timeout" => applets::timeout::run(&applet_args),
+        #[cfg(applet_od)]
+        "od" => applets::od::run(&applet_args),
+        #[cfg(applet_truncate)]
+        "truncate" => applets::truncate::run(&applet_args),
+        #[cfg(applet_strings)]
+        "strings" => applets::strings::run(&applet_args),
+        #[cfg(applet_cmp)]
+        "cmp" => applets::cmp::run(&applet_args),
+
         // Help / meta
         "help" | "--help" | "-h" => {
             print_help();
@@ -375,19 +399,20 @@ fn print_help() {
     let applets = [
         "addgroup", "adduser", "ar", "arp", "arping", "awk", "base64", "basename",
         "blkid", "bunzip2", "bzcat", "bzip2", "cat", "chgrp", "chmod", "chown",
-        "clear", "cp", "cut", "date", "dd", "delgroup", "deluser", "df", "diff",
-        "dirname", "dmesg", "dos2unix", "du", "echo", "env", "expr", "false",
-        "fbset", "fdisk", "find", "fold", "fsck", "fsync", "ftpd", "ftpget",
-        "ftpput", "fuser", "getopt", "getty", "grep", "gunzip", "gzip", "hd",
-        "head", "hexdump", "hostid", "hostname", "httpd", "hwclock", "id",
-        "ifconfig", "ifdown", "ifup", "init", "insmod", "install", "ip", "ipaddr",
-        "ipcalc", "ipcrm", "ipcs", "kill", "killall", "klogd", "last", "length",
-        "less", "ln", "logger", "login", "logname", "logread", "losetup", "ls",
-        "lsmod", "md5sum", "mdev", "mkdir", "mv", "nl", "nohup", "paste",
-        "printenv", "printf", "pwd", "readlink", "realpath", "rev", "rm", "rmdir",
-        "sed", "seq", "sha256sum", "sleep", "sort", "stat", "tail", "tee", "test",
-        "touch", "tr", "true", "tty", "udevadm", "udevd", "uname", "uniq",
-        "uptime", "wc", "which", "whoami", "xargs", "xxd", "yes",
+        "clear", "cmp", "cp", "cut", "date", "dd", "delgroup", "deluser", "df",
+        "diff", "dirname", "dmesg", "dos2unix", "du", "echo", "env", "expr",
+        "false", "fbset", "fdisk", "find", "fold", "free", "fsck", "fsync",
+        "ftpd", "ftpget", "ftpput", "fuser", "getopt", "getty", "grep", "gunzip",
+        "gzip", "hd", "head", "hexdump", "hostid", "hostname", "httpd", "hwclock",
+        "id", "ifconfig", "ifdown", "ifup", "init", "insmod", "install", "ip",
+        "ipaddr", "ipcalc", "ipcrm", "ipcs", "kill", "killall", "klogd", "last",
+        "length", "less", "ln", "logger", "login", "logname", "logread", "losetup",
+        "ls", "lsmod", "md5sum", "mdev", "mkdir", "mktemp", "mv", "nl", "nohup",
+        "nproc", "od", "paste", "printenv", "printf", "ps", "pwd", "readlink",
+        "realpath", "rev", "rm", "rmdir", "sed", "seq", "sha256sum", "sleep",
+        "sort", "stat", "strings", "sync", "tac", "tail", "tee", "test", "timeout",
+        "touch", "tr", "true", "truncate", "tty", "udevadm", "udevd", "uname",
+        "uniq", "uptime", "wc", "which", "whoami", "xargs", "xxd", "yes",
     ];
     for line in applets.chunks(10) {
         println!("  {}", line.join(", "));

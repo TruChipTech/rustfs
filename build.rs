@@ -156,6 +156,17 @@ fn main() {
         "APPLET_MODPROBE",
         "APPLET_MODINFO",
         "APPLET_SH",
+        "APPLET_PS",
+        "APPLET_FREE",
+        "APPLET_SYNC",
+        "APPLET_MKTEMP",
+        "APPLET_NPROC",
+        "APPLET_TAC",
+        "APPLET_TIMEOUT",
+        "APPLET_OD",
+        "APPLET_TRUNCATE",
+        "APPLET_STRINGS",
+        "APPLET_CMP",
     ];
 
     for opt in &all_options {
@@ -170,8 +181,14 @@ fn main() {
 
     // Rebuild if .config changes
     println!("cargo:rerun-if-changed=.config");
-    println!("cargo:rustc-link-lib=crypt");
     println!("cargo:rerun-if-changed=configs/default_defconfig");
+
+    // musl has crypt() built into libc; only link libcrypt for glibc targets
+    let target = std::env::var("TARGET").unwrap_or_default();
+    if !target.contains("musl") {
+        println!("cargo:rustc-link-lib=crypt");
+    }
+    println!("cargo:rerun-if-env-changed=TARGET");
 }
 
 fn parse_dotconfig(path: &Path) -> HashMap<String, String> {

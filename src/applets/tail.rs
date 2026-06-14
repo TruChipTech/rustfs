@@ -13,6 +13,7 @@ pub fn run(args: &[String]) -> i32 {
     let mut num_lines: usize = 10;
     let mut num_bytes: Option<usize> = None;
     let mut follow = false;
+    let mut follow_name = false; // -F: reopen on rotation
     let mut files = Vec::new();
 
     let mut i = 0;
@@ -30,11 +31,12 @@ pub fn run(args: &[String]) -> i32 {
                     num_bytes = Some(args[i].parse().unwrap_or(0));
                 }
             }
-            "-f" | "--follow" => follow = true,
-            arg if arg.starts_with("-n") => {
+            "-f" | "--follow" | "--follow=descriptor" => follow = true,
+            "-F" | "--follow=name" => { follow = true; follow_name = true; }
+            arg if arg.starts_with("-n") && arg.len() > 2 => {
                 num_lines = arg[2..].parse().unwrap_or(10);
             }
-            arg if arg.starts_with("-c") => {
+            arg if arg.starts_with("-c") && arg.len() > 2 => {
                 num_bytes = Some(arg[2..].parse().unwrap_or(0));
             }
             arg if arg.starts_with('-') && arg.len() > 1 && arg[1..].parse::<usize>().is_ok() => {
@@ -98,7 +100,11 @@ pub fn run(args: &[String]) -> i32 {
 
                     // Follow mode
                     if follow {
-                        follow_file(file);
+                        if follow_name {
+                            follow_file_name(file);
+                        } else {
+                            follow_file(file);
+                        }
                     }
                 }
                 Err(e) => {
@@ -141,14 +147,10 @@ fn tail_bytes(file: &File, n: usize) {
 }
 
 fn follow_file(path: &str) {
-    // Simple polling follow implementation
-    // Handle file truncation during follow
     use std::thread;
     use std::time::Duration;
 
-    let mut last_size = std::fs::metadata(path)
-        .map(|m| m.len())
-        .unwrap_or(0);
+    let mut last_size = std::fs::metadata(path).map(|m| m.len()).unwrap_or(0);
 
     loop {
         thread::sleep(Duration::from_secs(1));
@@ -158,10 +160,7 @@ fn follow_file(path: &str) {
             Err(_) => continue,
         };
 
-        // File was truncated — reset
-        if current_size < last_size {
-            last_size = 0;
-        }
+        if current_size < last_size { last_size = 0; }
 
         if current_size > last_size {
             if let Ok(mut f) = File::open(path) {
@@ -178,6 +177,50 @@ fn follow_file(path: &str) {
                     }
                 }
                 last_size = current_size;
+            }
+        }
+    }
+}
+
+fn follow_file_name(path: &str) {
+    // Like follow_file but reopens the file when it's replaced (log rotation).
+    use std::os::unix::fs::MetadataExt;
+    use std::thread;
+    use std::time::Duration;
+
+    let get_inode = |p: &str| std::fs::metadata(p).ok().map(|m| m.ino());
+
+    let mut last_inode = get_inode(path);
+    let mut last_size: u64 = std::fs::metadata(path).map(|m| m.len()).unwrap_or(0);
+
+    loop {
+        thread::sleep(Duration::from_millis(500));
+
+        let cur_inode = get_inode(path);
+        let cur_size  = std::fs::metadata(path).map(|m| m.len()).unwrap_or(0);
+
+        // File replaced (different inode) or truncated
+        if cur_inode != last_inode || cur_size < last_size {
+            eprintln!("tail: '{path}': file truncated or replaced; following new file");
+            last_size  = 0;
+            last_inode = cur_inode;
+        }
+
+        if cur_size > last_size {
+            if let Ok(mut f) = File::open(path) {
+                let _ = f.seek(SeekFrom::Start(last_size));
+                let mut buf = vec![0u8; 8192];
+                loop {
+                    match f.read(&mut buf) {
+                        Ok(0) => break,
+                        Ok(n) => {
+                            use std::io::Write;
+                            let _ = io::stdout().write_all(&buf[..n]);
+                        }
+                        Err(_) => break,
+                    }
+                }
+                last_size = cur_size;
             }
         }
     }

@@ -258,6 +258,30 @@ pub mod modinfo;
 #[cfg(applet_sh)]
 pub mod sh;
 
+// New applets
+#[cfg(applet_ps)]
+pub mod ps;
+#[cfg(applet_free)]
+pub mod free;
+#[cfg(applet_sync)]
+pub mod sync;
+#[cfg(applet_mktemp)]
+pub mod mktemp;
+#[cfg(applet_nproc)]
+pub mod nproc;
+#[cfg(applet_tac)]
+pub mod tac;
+#[cfg(applet_timeout)]
+pub mod timeout;
+#[cfg(applet_od)]
+pub mod od;
+#[cfg(applet_truncate)]
+pub mod truncate;
+#[cfg(applet_strings)]
+pub mod strings;
+#[cfg(applet_cmp)]
+pub mod cmp;
+
 #[cfg(init)]
 
 pub mod init;

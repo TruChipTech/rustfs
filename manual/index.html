@@ -137,6 +137,7 @@
 <body>
 <header>
   <span class="pill">RustFS Manual</span>
+  <span class="pill">v1.1.0</span>
   <span class="pill">Multi-call command reference</span>
   <h1>RustFS command manual</h1>
   <p class="lede">
@@ -241,6 +242,8 @@ ln -s rustfs ls
         <tr><td><code>rmdir</code></td><td>Remove empty directories.</td><td>Use on directory paths that are already empty.</td></tr>
         <tr><td><code>ls</code></td><td>List directory contents.</td><td>Commonly used as <code>ls [-la] [PATH...]</code></td></tr>
         <tr><td><code>touch</code></td><td>Create empty files or update timestamps.</td><td><code>touch [FILE]...</code></td></tr>
+        <tr><td><code>mktemp</code></td><td>Create a uniquely named temporary file or directory.</td><td><code>mktemp [-d] [-p DIR] [--suffix=S] [TEMPLATE]</code></td></tr>
+        <tr><td><code>truncate</code></td><td>Shrink or extend a file to a given size.</td><td><code>truncate -s SIZE [-c] [-r FILE] FILE...</code></td></tr>
         <tr><td><code>ln</code></td><td>Create hard or symbolic links.</td><td>Usually takes source and destination, with a symbolic-link mode.</td></tr>
         <tr><td><code>chmod</code></td><td>Change permissions.</td><td>Pass a mode such as <code>755</code> and the target file list.</td></tr>
         <tr><td><code>chgrp</code></td><td>Change group ownership.</td><td><code>chgrp [-Rv] GROUP FILE...</code></td></tr>
@@ -278,13 +281,17 @@ ln -s rustfs ls
         <tr><td><code>paste</code></td><td>Merge lines from files.</td><td><code>paste [-d DELIM] [-s] [FILE]...</code></td></tr>
         <tr><td><code>fold</code></td><td>Wrap long lines.</td><td>Typically supports width selection.</td></tr>
         <tr><td><code>rev</code></td><td>Reverse each line of input.</td><td>File or stdin input.</td></tr>
+        <tr><td><code>tac</code></td><td>Print lines in reverse order (cat backwards).</td><td><code>tac [FILE]...</code></td></tr>
         <tr><td><code>nl</code></td><td>Number lines of input.</td><td>Works like <code>cat -n</code> with numbering controls.</td></tr>
         <tr><td><code>awk</code></td><td>Pattern scanning and reporting language.</td><td><code>awk [-F sep] [-v var=val] 'program' [file...]</code></td></tr>
         <tr><td><code>diff</code></td><td>Compare two files.</td><td><code>diff [-u] [-U NUM] FILE1 FILE2</code></td></tr>
+        <tr><td><code>cmp</code></td><td>Compare two files byte by byte.</td><td><code>cmp [-ls] [-i N] FILE1 FILE2</code></td></tr>
         <tr><td><code>dos2unix</code></td><td>Convert CRLF line endings to LF.</td><td><code>dos2unix [file...]</code></td></tr>
         <tr><td><code>getopt</code></td><td>Parse command-line options in shell scripts.</td><td><code>getopt -o OPTSTRING [-l LONGOPTS] [-n NAME] -- PARAMS...</code></td></tr>
         <tr><td><code>hd</code></td><td>Human-oriented hex dump helper.</td><td><code>hd [-n LENGTH] [file...]</code></td></tr>
         <tr><td><code>hexdump</code></td><td>Hexadecimal and ASCII dump of binary data.</td><td><code>hexdump [-C] [-n LENGTH] [-s SKIP] [file...]</code></td></tr>
+        <tr><td><code>od</code></td><td>Dump files in octal, hex, decimal, or ASCII.</td><td><code>od [-bcddox] [-t TYPE] [-A RADIX] [-N COUNT] [-j SKIP] [FILE]...</code></td></tr>
+        <tr><td><code>strings</code></td><td>Print printable character sequences from binary files.</td><td><code>strings [-n MIN] [-t RADIX] [FILE]...</code></td></tr>
         <tr><td><code>length</code></td><td>Report string length.</td><td>Useful in shell pipelines and scripts.</td></tr>
     </tbody>
     </table>
@@ -300,6 +307,9 @@ ln -s rustfs ls
         <tr><td><code>whoami</code></td><td>Print the current username.</td><td><code>whoami</code></td></tr>
         <tr><td><code>id</code></td><td>Show user and group IDs.</td><td>Often supports user and group selection.</td></tr>
         <tr><td><code>uptime</code></td><td>Show system uptime and load average.</td><td><code>uptime</code></td></tr>
+        <tr><td><code>ps</code></td><td>List running processes.</td><td><code>ps [-e|-A|-a] [-f|-u]</code></td></tr>
+        <tr><td><code>free</code></td><td>Display memory and swap usage.</td><td><code>free [-h] [-b|-k|-m|-g]</code></td></tr>
+        <tr><td><code>nproc</code></td><td>Print the number of available processor units.</td><td><code>nproc [--all] [--ignore=N]</code></td></tr>
         <tr><td><code>date</code></td><td>Show or set the current date and time.</td><td>Supports formatting and timestamp control.</td></tr>
         <tr><td><code>env</code></td><td>Run a program with a modified environment.</td><td>Often used as <code>env NAME=value command</code></td></tr>
         <tr><td><code>printenv</code></td><td>Print environment variables.</td><td><code>printenv [NAME]...</code></td></tr>
@@ -320,6 +330,7 @@ ln -s rustfs ls
         <tr><td><code>getty</code></td><td>Spawn a login prompt on a serial console or TTY.</td><td><code>getty [-n] [-l LOGIN] BAUD TTY [TERM]</code></td></tr>
         <tr><td><code>kill</code></td><td>Send a signal to processes.</td><td><code>kill [-s SIGNAL | -SIGNAL] PID...</code></td></tr>
         <tr><td><code>killall</code></td><td>Send a signal to processes matching a name.</td><td><code>killall [-q] [-s SIGNAL] NAME...</code></td></tr>
+        <tr><td><code>timeout</code></td><td>Run a command with a time limit; exits 124 on expiry.</td><td><code>timeout [-s SIG] DURATION COMMAND [ARG]...</code></td></tr>
         <tr><td><code>last</code></td><td>Show login history.</td><td><code>last [-n NUM] [-f FILE]</code></td></tr>
         <tr><td><code>logger</code></td><td>Send a message to syslog.</td><td><code>logger [-p PRIORITY] [-t TAG] [-s] MESSAGE...</code></td></tr>
         <tr><td><code>logread</code></td><td>Read system log messages.</td><td><code>logread [-f]</code></td></tr>
@@ -378,6 +389,7 @@ ln -s rustfs ls
         <tr><td><code>fdisk</code></td><td>Partition disk devices.</td><td><code>fdisk [-l] device</code></td></tr>
         <tr><td><code>fsck</code></td><td>Check and repair filesystems.</td><td><code>fsck [-anpvy] [-t fstype] device...</code></td></tr>
         <tr><td><code>fsync</code></td><td>Flush file contents and metadata to disk.</td><td><code>fsync [-d] FILE...</code></td></tr>
+        <tr><td><code>sync</code></td><td>Flush all pending filesystem writes to disk.</td><td><code>sync</code></td></tr>
         <tr><td><code>hwclock</code></td><td>Read or set the hardware clock.</td><td><code>hwclock [-r|-w|-s] [-u|-l]</code></td></tr>
         <tr><td><code>losetup</code></td><td>Attach or detach loop devices.</td><td><code>losetup [-d DEVICE] [-D] [-f] [-r] [-o OFFSET] [DEVICE] [FILE]</code></td></tr>
         <tr><td><code>mount</code></td><td>Mount filesystems.</td><td><code>mount [-t type] [-o options] [-r] [-w] [device] [mountpoint]</code></td></tr>
@@ -454,7 +466,7 @@ ln -s rustfs ls
   </section>
 </main>
 <footer>
-  RustFS manual page generated for the current repository state. For exact behavior, prefer the inline help shown by each applet when available.
+  RustFS v1.1.0 — manual generated for the current repository state. For exact behavior, prefer the inline help shown by each applet when available.
 </footer>
 </body>
 </html>
