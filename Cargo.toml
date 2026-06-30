@@ -5,7 +5,7 @@
 # Licensed under MIT
 [package]
 name = "rustfs"
-version = "1.1.0"
+version = "1.2.0"
 edition = "2021"
 description = "Rust-based rootfs utilities — safe, correct, and fast"
 license = "MIT"
@@ -45,12 +45,32 @@ unexpected_cfgs = { level = "allow", check-cfg = [
     'cfg(applet_length)', 'cfg(applet_less)', 'cfg(applet_logger)', 'cfg(applet_login)',
     'cfg(applet_logname)', 'cfg(applet_logread)', 'cfg(applet_losetup)', 'cfg(applet_lsmod)',
     'cfg(applet_mount)', 'cfg(applet_umount)', 'cfg(applet_rmmod)',
+    'cfg(applet_kexec)', 'cfg(applet_switch_root)', 'cfg(applet_chroot)',
     'cfg(applet_depmod)', 'cfg(applet_modprobe)', 'cfg(applet_modinfo)',
     'cfg(applet_sh)',
     'cfg(applet_ps)', 'cfg(applet_free)', 'cfg(applet_sync)',
     'cfg(applet_mktemp)', 'cfg(applet_nproc)', 'cfg(applet_tac)',
     'cfg(applet_timeout)', 'cfg(applet_od)', 'cfg(applet_truncate)',
     'cfg(applet_strings)', 'cfg(applet_cmp)',
+    'cfg(applet_comm)', 'cfg(applet_cal)', 'cfg(applet_cksum)', 'cfg(applet_sum)',
+    'cfg(applet_expand)', 'cfg(applet_unexpand)', 'cfg(applet_split)',
+    'cfg(applet_uuencode)', 'cfg(applet_uudecode)', 'cfg(applet_unix2dos)',
+    'cfg(applet_dnsdomainname)', 'cfg(applet_dc)', 'cfg(applet_sha1sum)',
+    'cfg(applet_sha512sum)',
+    'cfg(applet_pidof)', 'cfg(applet_pgrep)', 'cfg(applet_pkill)',
+    'cfg(applet_killall5)', 'cfg(applet_setsid)', 'cfg(applet_usleep)',
+    'cfg(applet_nice)', 'cfg(applet_renice)', 'cfg(applet_ionice)',
+    'cfg(applet_chrt)', 'cfg(applet_taskset)', 'cfg(applet_who)',
+    'cfg(applet_mesg)', 'cfg(applet_ttysize)', 'cfg(applet_watch)',
+    'cfg(applet_time)', 'cfg(applet_mountpoint)', 'cfg(applet_pivot_root)',
+    'cfg(applet_mknod)', 'cfg(applet_mkfifo)', 'cfg(applet_devmem)',
+    'cfg(applet_eject)', 'cfg(applet_freeramdisk)', 'cfg(applet_swapon)',
+    'cfg(applet_swapoff)', 'cfg(applet_sysctl)', 'cfg(applet_findfs)',
+    'cfg(applet_mkswap)', 'cfg(applet_rdev)', 'cfg(applet_lsattr)',
+    'cfg(applet_chattr)', 'cfg(applet_fdformat)', 'cfg(applet_hdparm)',
+    'cfg(applet_flash_lock)', 'cfg(applet_flash_unlock)', 'cfg(applet_readprofile)',
+    'cfg(applet_rtcwake)', 'cfg(applet_adjtimex)', 'cfg(applet_raidautorun)',
+    'cfg(applet_fdflush)',
 ] }
 
 [features]
@@ -64,6 +84,7 @@ regex = "1"
 libc = "0.2"
 base64 = "0.22"
 sha2 = "0.10"
+sha1 = "0.10"
 md-5 = "0.10"
 walkdir = "2"
 bzip2 = "0.5"
@@ -74,7 +95,10 @@ nix = { version = "0.29", features = ["fs", "process", "signal", "user", "hostna
 users = "0.11"
 
 [profile.release]
-opt-level = "s"
-lto = true
-strip = true
-panic = "abort"
+opt-level = "z"        # optimize aggressively for size
+lto = "fat"           # whole-program link-time optimization
+codegen-units = 1     # better cross-module size optimization (no parallel splitting)
+strip = true          # strip symbols and debug info from the binary
+panic = "abort"       # drop unwinding tables / landing pads
+incremental = false
+overflow-checks = false

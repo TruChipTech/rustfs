@@ -18,7 +18,7 @@ pub fn run(_args: &[String]) -> i32 {
         }
     };
 
-    println!("{:<28} {:>8}  {}", "Module", "Size", "Used by");
+    println!("{:<28} {:>8}  Used by", "Module", "Size");
 
     for line in content.lines() {
         let parts: Vec<&str> = line.split_whitespace().collect();

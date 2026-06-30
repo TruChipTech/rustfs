@@ -17,7 +17,7 @@ pub fn run(args: &[String]) -> i32 {
     let mut directory_mode = false;
     let mut strip = false;
     let mut sources: Vec<String> = Vec::new();
-    let dest;
+    
 
     let mut i = 0;
     while i < args.len() {
@@ -63,7 +63,7 @@ pub fn run(args: &[String]) -> i32 {
         return 1;
     }
 
-    dest = sources.pop().unwrap();
+    let dest = sources.pop().unwrap();
     let dest_is_dir = std::path::Path::new(&dest).is_dir();
 
     if sources.len() > 1 && !dest_is_dir {

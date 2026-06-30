@@ -30,27 +30,22 @@ pub fn run(args: &[String]) -> i32 {
     let mut i = 1;
     while i < args.len() {
         match args[i].as_str() {
-            "up" => {
-                if set_interface_flags(iface, true) != 0 { return 1; }
-            }
-            "down" => {
-                if set_interface_flags(iface, false) != 0 { return 1; }
-            }
+            "up"
+                if set_interface_flags(iface, true) != 0 => { return 1; }
+            "down"
+                if set_interface_flags(iface, false) != 0 => { return 1; }
             "netmask" => {
                 i += 1;
-                if i < args.len() {
-                    if set_netmask(iface, &args[i]) != 0 { return 1; }
-                }
+                if i < args.len()
+                    && set_netmask(iface, &args[i]) != 0 { return 1; }
             }
             "mtu" => {
                 i += 1;
-                if i < args.len() {
-                    if set_mtu(iface, &args[i]) != 0 { return 1; }
-                }
+                if i < args.len()
+                    && set_mtu(iface, &args[i]) != 0 { return 1; }
             }
-            addr if !addr.starts_with('-') => {
-                if set_address(iface, addr) != 0 { return 1; }
-            }
+            addr if !addr.starts_with('-')
+                && set_address(iface, addr) != 0 => { return 1; }
             _ => {}
         }
         i += 1;

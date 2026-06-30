@@ -35,9 +35,7 @@ pub fn run(args: &[String]) -> i32 {
                 }
             }
             s if !s.starts_with('-') || program.is_empty() && !s.starts_with('-') => {
-                if program.is_empty() && !std::path::Path::new(s).exists() {
-                    program = s.to_string();
-                } else if program.is_empty() {
+                if program.is_empty() {
                     program = s.to_string();
                 } else {
                     files.push(s.to_string());
@@ -88,10 +86,8 @@ pub fn run(args: &[String]) -> i32 {
 
     if files.is_empty() {
         let stdin = io::stdin();
-        for line in stdin.lock().lines() {
-            if let Ok(l) = line {
-                process_line(&l, &rules, &mut state);
-            }
+        for l in stdin.lock().lines().map_while(Result::ok) {
+            process_line(&l, &rules, &mut state);
         }
     } else {
         for file in &files {
@@ -292,8 +288,7 @@ fn evaluate_condition(expr: &str, state: &AwkState) -> bool {
 }
 
 fn resolve_value(token: &str, state: &AwkState) -> String {
-    if token.starts_with('$') {
-        let idx_str = &token[1..];
+    if let Some(idx_str) = token.strip_prefix('$') {
         if idx_str == "0" {
             return state.line.clone();
         }

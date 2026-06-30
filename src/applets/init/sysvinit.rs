@@ -202,8 +202,7 @@ fn is_mounted(path: &str) -> bool {
     if let Ok(mounts) = fs::read_to_string("/proc/mounts") {
         mounts.lines().any(|line| {
             line.split_whitespace()
-                .nth(1)
-                .map_or(false, |mp| mp == path)
+                .nth(1) == Some(path)
         })
     } else {
         false
@@ -350,7 +349,7 @@ fn enter_runlevel(entries: &[InittabEntry], runlevel: u8) {
             respawn_procs.insert(
                 entry.id.clone(),
                 ProcessState {
-                    pid: pid,
+                    pid,
                     entry: entry.clone(),
                     restart_count: 0,
                 },

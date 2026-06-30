@@ -240,8 +240,8 @@ fn process_event(event: &UEvent, rules: &[UdevRule]) {
     }
 
     match event.action.as_str() {
-        "add" | "change" => {
-            if !event.major.is_empty() && !event.minor.is_empty() {
+        "add" | "change"
+            if !event.major.is_empty() && !event.minor.is_empty() => {
                 let dev_path = format!("/dev/{name}");
                 let major: u32 = event.major.parse().unwrap_or(0);
                 let minor: u32 = event.minor.parse().unwrap_or(0);
@@ -277,7 +277,6 @@ fn process_event(event: &UEvent, rules: &[UdevRule]) {
                     let _ = symlink(&dev_path, &link_path);
                 }
             }
-        }
         "remove" => {
             let dev_path = format!("/dev/{name}");
             let _ = fs::remove_file(&dev_path);
@@ -310,31 +309,28 @@ fn process_event(event: &UEvent, rules: &[UdevRule]) {
 fn rule_matches(rule: &UdevRule, event: &UEvent) -> bool {
     for token in &rule.tokens {
         match token {
-            RuleToken::MatchAction(pat) => {
-                if !pattern_match(pat, &event.action) {
+            RuleToken::MatchAction(pat)
+                if !pattern_match(pat, &event.action) => {
                     return false;
                 }
-            }
-            RuleToken::MatchSubsystem(pat) => {
-                if !pattern_match(pat, &event.subsystem) {
+            RuleToken::MatchSubsystem(pat)
+                if !pattern_match(pat, &event.subsystem) => {
                     return false;
                 }
-            }
             RuleToken::MatchKernel(pat) => {
                 let kernel_name = event
                     .devname
                     .split('/')
-                    .last()
+                    .next_back()
                     .unwrap_or(&event.devname);
                 if !pattern_match(pat, kernel_name) {
                     return false;
                 }
             }
-            RuleToken::MatchDevpath(pat) => {
-                if !pattern_match(pat, &event.devpath) {
+            RuleToken::MatchDevpath(pat)
+                if !pattern_match(pat, &event.devpath) => {
                     return false;
                 }
-            }
             RuleToken::MatchAttr(key, pat) => {
                 let attr_path = format!("/sys{}/{key}", event.devpath);
                 let val = fs::read_to_string(&attr_path)
@@ -646,8 +642,7 @@ fn trigger_dir(base: &str) {
 /// Show device information from sysfs
 fn show_device_info(device: &str) -> i32 {
     // Accept /dev/xxx or /sys/xxx paths
-    let syspath = if device.starts_with("/dev/") {
-        let devname = &device[5..];
+    let syspath = if let Some(devname) = device.strip_prefix("/dev/") {
         // Try to find in /sys/class
         let mut found = String::new();
         if let Ok(classes) = fs::read_dir("/sys/class") {

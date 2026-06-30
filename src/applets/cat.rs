@@ -113,11 +113,10 @@ pub fn run(args: &[String]) -> i32 {
                 display_line = display_line.replace('\t', "^I");
             }
 
-            if number_nonblank && !is_blank {
-                let _ = write!(out, "{:>6}\t", line_num);
-                line_num += 1;
-            } else if number_lines {
-                let _ = write!(out, "{:>6}\t", line_num);
+            // -b (number non-blank) overrides -n (number all lines).
+            let do_number = if number_nonblank { !is_blank } else { number_lines };
+            if do_number {
+                let _ = write!(out, "{line_num:>6}\t");
                 line_num += 1;
             }
 

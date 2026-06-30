@@ -39,7 +39,7 @@ pub fn run(args: &[String]) -> i32 {
 
         #[cfg(init_systemd)]
         {
-            return systemd_compat::run(args);
+            systemd_compat::run(args)
         }
 
         #[cfg(not(any(init_rustfs, init_sysvinit, init_systemd)))]

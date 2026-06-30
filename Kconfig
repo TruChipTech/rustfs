@@ -589,6 +589,18 @@ config APPLET_UMOUNT
     bool "umount"
     default y
 
+config APPLET_CHROOT
+    bool "chroot"
+    default y
+
+config APPLET_KEXEC
+    bool "kexec"
+    default y
+
+config APPLET_SWITCH_ROOT
+    bool "switch_root"
+    default y
+
 config APPLET_RMMOD
     bool "rmmod"
     default y
@@ -697,5 +709,221 @@ config APPLET_CMP
     help
       Compare two files and report the first differing byte.
       Supports -l (list all differences), -s (silent, exit code only).
+
+config APPLET_COMM
+    bool "comm — compare two sorted files line by line"
+    default y
+
+config APPLET_CAL
+    bool "cal — display a calendar"
+    default y
+
+config APPLET_CKSUM
+    bool "cksum — POSIX CRC checksum and byte count"
+    default y
+
+config APPLET_SUM
+    bool "sum — BSD/SysV checksum and block count"
+    default y
+
+config APPLET_EXPAND
+    bool "expand — convert tabs to spaces"
+    default y
+
+config APPLET_UNEXPAND
+    bool "unexpand — convert spaces to tabs"
+    default y
+
+config APPLET_SPLIT
+    bool "split — split a file into pieces"
+    default y
+
+config APPLET_UUENCODE
+    bool "uuencode — encode a file (uu or base64)"
+    default y
+
+config APPLET_UUDECODE
+    bool "uudecode — decode a uuencoded file"
+    default y
+
+config APPLET_UNIX2DOS
+    bool "unix2dos — convert Unix line endings to DOS"
+    default y
+
+config APPLET_DNSDOMAINNAME
+    bool "dnsdomainname — show DNS domain name"
+    default y
+
+config APPLET_DC
+    bool "dc — reverse-polish desk calculator"
+    default y
+
+config APPLET_SHA1SUM
+    bool "sha1sum — compute and check SHA1 digests"
+    default y
+
+config APPLET_SHA512SUM
+    bool "sha512sum — compute and check SHA512 digests"
+    default y
+
+config APPLET_PIDOF
+    bool "pidof — find the process ID of a running program"
+    default y
+
+config APPLET_PGREP
+    bool "pgrep — look up processes by name"
+    default y
+
+config APPLET_PKILL
+    bool "pkill — signal processes by name"
+    default y
+
+config APPLET_KILLALL5
+    bool "killall5 — send a signal to all processes"
+    default y
+
+config APPLET_SETSID
+    bool "setsid — run a program in a new session"
+    default y
+
+config APPLET_USLEEP
+    bool "usleep — pause for microseconds"
+    default y
+
+config APPLET_NICE
+    bool "nice — run a program with modified priority"
+    default y
+
+config APPLET_RENICE
+    bool "renice — alter priority of running processes"
+    default y
+
+config APPLET_IONICE
+    bool "ionice — get/set I/O scheduling class"
+    default y
+
+config APPLET_CHRT
+    bool "chrt — manipulate real-time attributes"
+    default y
+
+config APPLET_TASKSET
+    bool "taskset — set/get CPU affinity"
+    default y
+
+config APPLET_WHO
+    bool "who — show who is logged on"
+    default y
+
+config APPLET_MESG
+    bool "mesg — control terminal write access"
+    default y
+
+config APPLET_TTYSIZE
+    bool "ttysize — print terminal width and height"
+    default y
+
+config APPLET_WATCH
+    bool "watch — run a program periodically"
+    default y
+
+config APPLET_TIME
+    bool "time — time a program's execution"
+    default y
+
+config APPLET_MOUNTPOINT
+    bool "mountpoint — test if a directory is a mountpoint"
+    default y
+
+config APPLET_PIVOT_ROOT
+    bool "pivot_root — change the root filesystem"
+    default y
+
+config APPLET_MKNOD
+    bool "mknod — make block or character special files"
+    default y
+
+config APPLET_MKFIFO
+    bool "mkfifo — make FIFOs (named pipes)"
+    default y
+
+config APPLET_DEVMEM
+    bool "devmem — read/write physical memory"
+    default y
+
+config APPLET_EJECT
+    bool "eject — eject removable media"
+    default y
+
+config APPLET_FREERAMDISK
+    bool "freeramdisk — free memory used by a ramdisk"
+    default y
+
+config APPLET_SWAPON
+    bool "swapon — enable swap devices/files"
+    default y
+
+config APPLET_SWAPOFF
+    bool "swapoff — disable swap devices/files"
+    default y
+
+config APPLET_SYSCTL
+    bool "sysctl — configure kernel parameters"
+    default y
+
+config APPLET_FINDFS
+    bool "findfs — find a filesystem by label/UUID"
+    default y
+
+config APPLET_MKSWAP
+    bool "mkswap — set up a Linux swap area"
+    default y
+
+config APPLET_RDEV
+    bool "rdev — query the root filesystem device"
+    default y
+
+config APPLET_LSATTR
+    bool "lsattr — list ext2/3/4 file attributes"
+    default y
+
+config APPLET_CHATTR
+    bool "chattr — change ext2/3/4 file attributes"
+    default y
+
+config APPLET_FDFORMAT
+    bool "fdformat — low-level format a floppy disk"
+    default y
+
+config APPLET_HDPARM
+    bool "hdparm — get/set hard disk parameters"
+    default y
+
+config APPLET_FLASH_LOCK
+    bool "flash_lock — lock MTD flash regions"
+    default y
+
+config APPLET_FLASH_UNLOCK
+    bool "flash_unlock — unlock MTD flash regions"
+    default y
+
+config APPLET_READPROFILE
+    bool "readprofile — read kernel profiling info"
+    default y
+
+config APPLET_RTCWAKE
+    bool "rtcwake — sleep until an RTC wakeup time"
+    default y
+
+config APPLET_ADJTIMEX
+    bool "adjtimex — read/set kernel time variables"
+    default y
+
+config APPLET_RAIDAUTORUN
+    bool "raidautorun — auto-start RAID arrays"
+    default y
+
+config APPLET_FDFLUSH
+    bool "fdflush — drop cached floppy disk data"
+    default y
 
 endmenu

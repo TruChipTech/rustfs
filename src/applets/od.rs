@@ -77,13 +77,12 @@ pub fn run(args: &[String]) -> i32 {
     let mut star = false;
 
     for chunk in data.chunks(bytes_per_row.max(1)) {
-        if !verbose {
-            if prev.as_deref() == Some(chunk) {
+        if !verbose
+            && prev.as_deref() == Some(chunk) {
                 if !star { println!("*"); star = true; }
                 offset += chunk.len();
                 continue;
             }
-        }
         star = false;
         print!("{}", addr_str(offset, addr_radix));
         print_row(chunk, &fmt, bytes_per_row);

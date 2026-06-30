@@ -54,14 +54,13 @@ pub fn run(args: &[String]) -> i32 {
     // Detect login shell: argv[0] starts with '-' (e.g. "-sh")
     let is_login = std::env::args()
         .next()
-        .map_or(false, |a| a.starts_with('-'));
+        .is_some_and(|a| a.starts_with('-'));
 
     // Source /etc/profile for login shells
-    if is_login {
-        if std::path::Path::new("/etc/profile").exists() {
+    if is_login
+        && std::path::Path::new("/etc/profile").exists() {
             shell.execute_file("/etc/profile");
         }
-    }
 
     // sh -c "command"
     if let Some(cmd) = command_string {
@@ -526,8 +525,8 @@ impl Shell {
     }
 
     fn expand_words(&self, s: &str) -> Vec<String> {
-        let tokens = tokenize(&self.expand_variables(s));
-        tokens
+        
+        tokenize(&self.expand_variables(s))
     }
 
     fn execute_command_line(&mut self, line: &str) {
@@ -586,7 +585,12 @@ impl Shell {
 
             let (pipe_read, pipe_write) = if !is_last {
                 let mut fds = [0i32; 2];
-                if unsafe { libc::pipe(fds.as_mut_ptr()) } != 0 {
+                // Create the pipe with O_CLOEXEC so that the raw fds are not
+                // leaked into unrelated children (e.g. the producer inheriting
+                // its own pipe's read end, which would prevent it from ever
+                // seeing a broken pipe). The dup2 that wires up stdin/stdout
+                // clears CLOEXEC on the fds that actually need to survive exec.
+                if unsafe { libc::pipe2(fds.as_mut_ptr(), libc::O_CLOEXEC) } != 0 {
                     eprintln!("sh: pipe failed");
                     self.last_exit = 1;
                     return;
@@ -638,6 +642,18 @@ impl Shell {
             cmd.args(&args[1..])
                 .stdin(stdin_cfg)
                 .stdout(stdout_cfg);
+
+            // Restore the default SIGPIPE disposition in children. Rust sets
+            // SIGPIPE to SIG_IGN at startup and children inherit it, which would
+            // otherwise keep a pipeline producer (e.g. `yes`) alive after its
+            // consumer (e.g. `head`) has exited instead of letting it die on a
+            // broken pipe.
+            unsafe {
+                cmd.pre_exec(|| {
+                    libc::signal(libc::SIGPIPE, libc::SIG_DFL);
+                    Ok(())
+                });
+            }
 
             if redir.stderr_to_stdout {
                 unsafe {

@@ -103,16 +103,8 @@ pub fn run(args: &[String]) -> i32 {
 
 /// Create a gzip file using DEFLATE stored blocks (no compression, but valid gzip)
 fn gzip_stored(data: &[u8]) -> Vec<u8> {
-    let mut out = Vec::new();
-
-    // Gzip header
-    out.push(0x1f); // magic
-    out.push(0x8b); // magic
-    out.push(0x08); // method: deflate
-    out.push(0x00); // flags
-    out.extend_from_slice(&[0, 0, 0, 0]); // mtime
-    out.push(0x00); // xfl
-    out.push(0x03); // OS: Unix
+    // Gzip header: magic, method (deflate), flags, mtime, xfl, OS (Unix).
+    let mut out = vec![0x1f, 0x8b, 0x08, 0x00, 0, 0, 0, 0, 0x00, 0x03];
 
     // DEFLATE stored blocks
     let mut offset = 0;

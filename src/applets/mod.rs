@@ -245,6 +245,12 @@ pub mod losetup;
 pub mod lsmod;
 #[cfg(applet_mount)]
 pub mod mount;
+#[cfg(applet_chroot)]
+pub mod chroot;
+#[cfg(applet_kexec)]
+pub mod kexec;
+#[cfg(applet_switch_root)]
+pub mod switch_root;
 #[cfg(applet_umount)]
 pub mod umount;
 #[cfg(applet_rmmod)]
@@ -282,8 +288,121 @@ pub mod strings;
 #[cfg(applet_cmp)]
 pub mod cmp;
 
-#[cfg(init)]
+// Wave 1: aliases + tiny text utils
+#[cfg(applet_comm)]
+pub mod comm;
+#[cfg(applet_cal)]
+pub mod cal;
+#[cfg(applet_cksum)]
+pub mod cksum;
+#[cfg(applet_sum)]
+pub mod sum;
+#[cfg(applet_expand)]
+pub mod expand;
+#[cfg(applet_unexpand)]
+pub mod unexpand;
+#[cfg(applet_split)]
+pub mod split;
+#[cfg(applet_uuencode)]
+pub mod uuencode;
+#[cfg(applet_uudecode)]
+pub mod uudecode;
+#[cfg(applet_unix2dos)]
+pub mod unix2dos;
+#[cfg(applet_dnsdomainname)]
+pub mod dnsdomainname;
+#[cfg(applet_dc)]
+pub mod dc;
+#[cfg(applet_sha1sum)]
+pub mod sha1sum;
+#[cfg(applet_sha512sum)]
+pub mod sha512sum;
 
+// Wave 2: process/system small
+#[cfg(applet_pidof)]
+pub mod pidof;
+#[cfg(applet_pgrep)]
+pub mod pgrep;
+#[cfg(applet_pkill)]
+pub mod pkill;
+#[cfg(applet_killall5)]
+pub mod killall5;
+#[cfg(applet_setsid)]
+pub mod setsid;
+#[cfg(applet_usleep)]
+pub mod usleep;
+#[cfg(applet_nice)]
+pub mod nice;
+#[cfg(applet_renice)]
+pub mod renice;
+#[cfg(applet_ionice)]
+pub mod ionice;
+#[cfg(applet_chrt)]
+pub mod chrt;
+#[cfg(applet_taskset)]
+pub mod taskset;
+#[cfg(applet_who)]
+pub mod who;
+#[cfg(applet_mesg)]
+pub mod mesg;
+#[cfg(applet_ttysize)]
+pub mod ttysize;
+#[cfg(applet_watch)]
+pub mod watch;
+#[cfg(applet_time)]
+pub mod time;
+#[cfg(applet_mountpoint)]
+pub mod mountpoint;
+#[cfg(applet_pivot_root)]
+pub mod pivot_root;
+
+// Wave 3: filesystem/device
+#[cfg(applet_mknod)]
+pub mod mknod;
+#[cfg(applet_mkfifo)]
+pub mod mkfifo;
+#[cfg(applet_devmem)]
+pub mod devmem;
+#[cfg(applet_eject)]
+pub mod eject;
+#[cfg(applet_freeramdisk)]
+pub mod freeramdisk;
+#[cfg(applet_swapon)]
+pub mod swapon;
+#[cfg(applet_swapoff)]
+pub mod swapoff;
+#[cfg(applet_sysctl)]
+pub mod sysctl;
+#[cfg(applet_findfs)]
+pub mod findfs;
+#[cfg(applet_mkswap)]
+pub mod mkswap;
+#[cfg(applet_rdev)]
+pub mod rdev;
+#[cfg(applet_lsattr)]
+pub mod lsattr;
+#[cfg(applet_chattr)]
+pub mod chattr;
+#[cfg(applet_fdformat)]
+pub mod fdformat;
+#[cfg(applet_hdparm)]
+pub mod hdparm;
+#[cfg(applet_flash_lock)]
+pub mod flash_lock;
+#[cfg(applet_flash_unlock)]
+pub mod flash_unlock;
+#[cfg(applet_readprofile)]
+pub mod readprofile;
+#[cfg(applet_rtcwake)]
+pub mod rtcwake;
+#[cfg(applet_adjtimex)]
+pub mod adjtimex;
+#[cfg(applet_raidautorun)]
+pub mod raidautorun;
+#[cfg(applet_fdflush)]
+pub mod fdflush;
+
+#[cfg(init)]
 pub mod init;
 
 #[cfg(mdev)]

@@ -97,6 +97,7 @@ pub fn run(args: &[String]) -> i32 {
     exit_code
 }
 
+#[allow(clippy::too_many_arguments, clippy::only_used_in_recursion)]
 fn list_dir(
     dir: &str,
     show_hidden: bool,
@@ -140,7 +141,7 @@ fn list_dir(
             sb.cmp(&sa)
         });
     } else {
-        entries.sort_by(|a, b| a.file_name().cmp(&b.file_name()));
+        entries.sort_by_key(|a| a.file_name());
     }
 
     if reverse {
@@ -165,7 +166,7 @@ fn list_dir(
         let total_size: u64 = entries
             .iter()
             .filter_map(|e| e.metadata().ok())
-            .map(|m| (m.len() + 511) / 512)
+            .map(|m| m.len().div_ceil(512))
             .sum();
         println!("total {total_size}");
 
@@ -252,9 +253,9 @@ fn print_long_entry(path: &Path, human_readable: bool) {
     let modified = meta
         .modified()
         .ok()
-        .and_then(|t| {
+        .map(|t| {
             let datetime: chrono::DateTime<chrono::Local> = t.into();
-            Some(datetime.format("%b %e %H:%M").to_string())
+            datetime.format("%b %e %H:%M").to_string()
         })
         .unwrap_or_else(|| "???".to_string());
 

@@ -288,8 +288,7 @@ fn is_mounted(path: &str) -> bool {
     if let Ok(mounts) = fs::read_to_string("/proc/mounts") {
         mounts.lines().any(|line| {
             line.split_whitespace()
-                .nth(1)
-                .map_or(false, |mp| mp == path)
+                .nth(1) == Some(path)
         })
     } else {
         false
@@ -329,8 +328,7 @@ fn parse_service_file(path: &PathBuf) -> Option<ServiceUnit> {
     let content = fs::read_to_string(path).ok()?;
     let name = path.file_name()?.to_str()?.to_string();
 
-    let mut unit = ServiceUnit::default();
-    unit.name = name;
+    let mut unit = ServiceUnit { name, ..Default::default() };
 
     let mut section = String::new();
 

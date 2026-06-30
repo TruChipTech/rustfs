@@ -57,7 +57,7 @@ pub fn run(args: &[String]) -> i32 {
 
 fn process_escapes(s: &str) -> String {
     let mut result = String::with_capacity(s.len());
-    let mut chars = s.chars();
+    let mut chars = s.chars().peekable();
 
     while let Some(c) = chars.next() {
         if c == '\\' {
@@ -71,23 +71,30 @@ fn process_escapes(s: &str) -> String {
                 Some('v') => result.push('\x0B'),
                 Some('\\') => result.push('\\'),
                 Some('0') => {
-                    // Octal escape \0NNN
-                    let val = 0u8;
+                    // Octal escape \0NNN — up to 3 octal digits.
+                    let mut val: u8 = 0;
                     for _ in 0..3 {
-                        // peek is tricky with char iterator, do it manually
-                        break; // simplified - just push null
+                        match chars.peek().and_then(|c| c.to_digit(8)) {
+                            Some(d) => { val = val.wrapping_mul(8).wrapping_add(d as u8); chars.next(); }
+                            None => break,
+                        }
                     }
                     result.push(val as char);
                 }
                 Some('x') => {
-                    // Hex escape \xNN
-                    let hex = String::new();
-                    // Read up to 2 hex chars
-                    for _ in 0..2 {
-                        break; // simplified
+                    // Hex escape \xHH — up to 2 hex digits.
+                    let mut val: u8 = 0;
+                    let mut count = 0;
+                    while count < 2 {
+                        match chars.peek().and_then(|c| c.to_digit(16)) {
+                            Some(d) => { val = val.wrapping_mul(16).wrapping_add(d as u8); chars.next(); count += 1; }
+                            None => break,
+                        }
                     }
-                    if let Ok(val) = u8::from_str_radix(&hex, 16) {
+                    if count > 0 {
                         result.push(val as char);
+                    } else {
+                        result.push_str("\\x");
                     }
                 }
                 Some('c') => break, // \c stops output

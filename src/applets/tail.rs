@@ -120,7 +120,7 @@ pub fn run(args: &[String]) -> i32 {
 
 fn tail_lines(file: &File, n: usize) {
     let reader = BufReader::new(file);
-    let all_lines: Vec<String> = reader.lines().filter_map(|l| l.ok()).collect();
+    let all_lines: Vec<String> = reader.lines().map_while(Result::ok).collect();
     let start = all_lines.len().saturating_sub(n);
     for line in &all_lines[start..] {
         println!("{line}");

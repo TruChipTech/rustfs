@@ -262,6 +262,12 @@ fn main() {
         "mount" => applets::mount::run(&applet_args),
         #[cfg(applet_umount)]
         "umount" => applets::umount::run(&applet_args),
+        #[cfg(applet_chroot)]
+        "chroot" => applets::chroot::run(&applet_args),
+        #[cfg(applet_kexec)]
+        "kexec" => applets::kexec::run(&applet_args),
+        #[cfg(applet_switch_root)]
+        "switch_root" => applets::switch_root::run(&applet_args),
         #[cfg(applet_rmmod)]
         "rmmod" => applets::rmmod::run(&applet_args),
         #[cfg(applet_depmod)]
@@ -337,6 +343,138 @@ fn main() {
         #[cfg(applet_cmp)]
         "cmp" => applets::cmp::run(&applet_args),
 
+        // Wave 1: aliases + tiny text utils
+        #[cfg(applet_grep)]
+        "egrep" => {
+            let mut a = vec!["-E".to_string()];
+            a.extend(applet_args.iter().cloned());
+            applets::grep::run(&a)
+        }
+        #[cfg(applet_grep)]
+        "fgrep" => {
+            let mut a = vec!["-F".to_string()];
+            a.extend(applet_args.iter().cloned());
+            applets::grep::run(&a)
+        }
+        #[cfg(applet_gunzip)]
+        "zcat" => {
+            let mut a = vec!["-c".to_string()];
+            a.extend(applet_args.iter().cloned());
+            applets::gunzip::run(&a)
+        }
+        #[cfg(applet_comm)]
+        "comm" => applets::comm::run(&applet_args),
+        #[cfg(applet_cal)]
+        "cal" => applets::cal::run(&applet_args),
+        #[cfg(applet_cksum)]
+        "cksum" => applets::cksum::run(&applet_args),
+        #[cfg(applet_sum)]
+        "sum" => applets::sum::run(&applet_args),
+        #[cfg(applet_expand)]
+        "expand" => applets::expand::run(&applet_args),
+        #[cfg(applet_unexpand)]
+        "unexpand" => applets::unexpand::run(&applet_args),
+        #[cfg(applet_split)]
+        "split" => applets::split::run(&applet_args),
+        #[cfg(applet_uuencode)]
+        "uuencode" => applets::uuencode::run(&applet_args),
+        #[cfg(applet_uudecode)]
+        "uudecode" => applets::uudecode::run(&applet_args),
+        #[cfg(applet_unix2dos)]
+        "unix2dos" => applets::unix2dos::run(&applet_args),
+        #[cfg(applet_dnsdomainname)]
+        "dnsdomainname" => applets::dnsdomainname::run(&applet_args),
+        #[cfg(applet_dc)]
+        "dc" => applets::dc::run(&applet_args),
+        #[cfg(applet_sha1sum)]
+        "sha1sum" => applets::sha1sum::run(&applet_args),
+        #[cfg(applet_sha512sum)]
+        "sha512sum" => applets::sha512sum::run(&applet_args),
+
+        // Wave 2: process/system small
+        #[cfg(applet_pidof)]
+        "pidof" => applets::pidof::run(&applet_args),
+        #[cfg(applet_pgrep)]
+        "pgrep" => applets::pgrep::run(&applet_args),
+        #[cfg(applet_pkill)]
+        "pkill" => applets::pkill::run(&applet_args),
+        #[cfg(applet_killall5)]
+        "killall5" => applets::killall5::run(&applet_args),
+        #[cfg(applet_setsid)]
+        "setsid" => applets::setsid::run(&applet_args),
+        #[cfg(applet_usleep)]
+        "usleep" => applets::usleep::run(&applet_args),
+        #[cfg(applet_nice)]
+        "nice" => applets::nice::run(&applet_args),
+        #[cfg(applet_renice)]
+        "renice" => applets::renice::run(&applet_args),
+        #[cfg(applet_ionice)]
+        "ionice" => applets::ionice::run(&applet_args),
+        #[cfg(applet_chrt)]
+        "chrt" => applets::chrt::run(&applet_args),
+        #[cfg(applet_taskset)]
+        "taskset" => applets::taskset::run(&applet_args),
+        #[cfg(applet_who)]
+        "who" => applets::who::run(&applet_args),
+        #[cfg(applet_mesg)]
+        "mesg" => applets::mesg::run(&applet_args),
+        #[cfg(applet_ttysize)]
+        "ttysize" => applets::ttysize::run(&applet_args),
+        #[cfg(applet_watch)]
+        "watch" => applets::watch::run(&applet_args),
+        #[cfg(applet_time)]
+        "time" => applets::time::run(&applet_args),
+        #[cfg(applet_mountpoint)]
+        "mountpoint" => applets::mountpoint::run(&applet_args),
+        #[cfg(applet_pivot_root)]
+        "pivot_root" => applets::pivot_root::run(&applet_args),
+
+        // Wave 3: filesystem/device
+        #[cfg(applet_mknod)]
+        "mknod" => applets::mknod::run(&applet_args),
+        #[cfg(applet_mkfifo)]
+        "mkfifo" => applets::mkfifo::run(&applet_args),
+        #[cfg(applet_devmem)]
+        "devmem" => applets::devmem::run(&applet_args),
+        #[cfg(applet_eject)]
+        "eject" => applets::eject::run(&applet_args),
+        #[cfg(applet_freeramdisk)]
+        "freeramdisk" => applets::freeramdisk::run(&applet_args),
+        #[cfg(applet_swapon)]
+        "swapon" => applets::swapon::run(&applet_args),
+        #[cfg(applet_swapoff)]
+        "swapoff" => applets::swapoff::run(&applet_args),
+        #[cfg(applet_sysctl)]
+        "sysctl" => applets::sysctl::run(&applet_args),
+        #[cfg(applet_findfs)]
+        "findfs" => applets::findfs::run(&applet_args),
+        #[cfg(applet_mkswap)]
+        "mkswap" => applets::mkswap::run(&applet_args),
+        #[cfg(applet_rdev)]
+        "rdev" => applets::rdev::run(&applet_args),
+        #[cfg(applet_lsattr)]
+        "lsattr" => applets::lsattr::run(&applet_args),
+        #[cfg(applet_chattr)]
+        "chattr" => applets::chattr::run(&applet_args),
+        #[cfg(applet_fdformat)]
+        "fdformat" => applets::fdformat::run(&applet_args),
+        #[cfg(applet_hdparm)]
+        "hdparm" => applets::hdparm::run(&applet_args),
+        #[cfg(applet_flash_lock)]
+        "flash_lock" => applets::flash_lock::run(&applet_args),
+        #[cfg(applet_flash_unlock)]
+        "flash_unlock" => applets::flash_unlock::run(&applet_args),
+        #[cfg(applet_readprofile)]
+        "readprofile" => applets::readprofile::run(&applet_args),
+        #[cfg(applet_rtcwake)]
+        "rtcwake" => applets::rtcwake::run(&applet_args),
+        #[cfg(applet_adjtimex)]
+        "adjtimex" => applets::adjtimex::run(&applet_args),
+        #[cfg(applet_raidautorun)]
+        "raidautorun" => applets::raidautorun::run(&applet_args),
+        #[cfg(applet_fdflush)]
+        "fdflush" => applets::fdflush::run(&applet_args),
+
         // Help / meta
         "help" | "--help" | "-h" => {
             print_help();
@@ -410,9 +548,20 @@ fn print_help() {
         "ls", "lsmod", "md5sum", "mdev", "mkdir", "mktemp", "mv", "nl", "nohup",
         "nproc", "od", "paste", "printenv", "printf", "ps", "pwd", "readlink",
         "realpath", "rev", "rm", "rmdir", "sed", "seq", "sha256sum", "sleep",
+        "chroot", "kexec", "switch_root",
         "sort", "stat", "strings", "sync", "tac", "tail", "tee", "test", "timeout",
         "touch", "tr", "true", "truncate", "tty", "udevadm", "udevd", "uname",
         "uniq", "uptime", "wc", "which", "whoami", "xargs", "xxd", "yes",
+        "egrep", "fgrep", "zcat", "comm", "cal", "cksum", "sum", "expand",
+        "unexpand", "split", "uuencode", "uudecode", "unix2dos", "dnsdomainname",
+        "dc", "sha1sum", "sha512sum",
+        "pidof", "pgrep", "pkill", "killall5", "setsid", "usleep", "nice",
+        "renice", "ionice", "chrt", "taskset", "who", "mesg", "ttysize",
+        "watch", "time", "mountpoint", "pivot_root",
+        "mknod", "mkfifo", "devmem", "eject", "freeramdisk", "swapon", "swapoff",
+        "sysctl", "findfs", "mkswap", "rdev", "lsattr", "chattr", "fdformat",
+        "hdparm", "flash_lock", "flash_unlock", "readprofile", "rtcwake",
+        "adjtimex", "raidautorun", "fdflush",
     ];
     for line in applets.chunks(10) {
         println!("  {}", line.join(", "));

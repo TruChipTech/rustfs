@@ -102,6 +102,7 @@ pub fn run(args: &[String]) -> i32 {
     exit_code
 }
 
+#[allow(clippy::too_many_arguments)]
 fn print_counts(
     lines: u64,
     words: u64,

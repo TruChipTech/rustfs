@@ -36,7 +36,7 @@ pub fn run(args: &[String]) -> i32 {
                     let mut oct = String::new();
                     for _ in 0..3 {
                         if let Some(&d) = chars.peek() {
-                            if d >= '0' && d <= '7' {
+                            if ('0'..='7').contains(&d) {
                                 oct.push(d);
                                 chars.next();
                             } else {

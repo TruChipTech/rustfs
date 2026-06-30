@@ -150,37 +150,45 @@ chmod +x "$INSTALL_DIR/bin/rustfs"
 # init symlink at root level
 ln -sf bin/rustfs "$INSTALL_DIR/init"
 
-# Applets for bin/
-BIN_APPLETS="ar awk base64 basename bunzip2 bzcat bzip2 cat chgrp chown chmod
-clear cp cut date dd df diff dirname dos2unix du echo env expr false find
-fold getopt grep gzip gunzip hd head hexdump hostid hostname id install
-last length less ln logname ls md5sum mkdir mv nl nohup paste printenv
-printf pwd readlink realpath rev rm rmdir sed seq sh sha256sum sleep sort
-stat tail tee test touch tr true tty uname uniq uptime wc which whoami
-xargs xxd yes"
+# Admin/system applets that conventionally live in sbin/. Everything else the
+# binary supports goes to bin/. (depmod/modinfo/modprobe/rmmod/halt/poweroff/
+# reboot are aliases the binary may also accept.)
+SBIN_APPLETS="addgroup adduser arp arping blkid delgroup deluser dmesg
+fbset fdisk fsck fsync ftpd ftpget ftpput fuser getty halt httpd hwclock
+ifconfig ifdown ifup init insmod ip ipaddr ipcalc ipcrm ipcs kill killall
+killall5 klogd logger login logread losetup lsmod mdev modinfo modprobe mount
+poweroff reboot rmmod depmod umount udevd udevadm swapon swapoff mkswap
+pivot_root switch_root sysctl rdev findfs raidautorun freeramdisk"
 
 # Special symlink: [ -> rustfs (test applet)
 ln -sf rustfs "$INSTALL_DIR/bin/[" 2>/dev/null || true
 # ash alias
 ln -sf rustfs "$INSTALL_DIR/bin/ash" 2>/dev/null || true
 
-# Applets for sbin/
-SBIN_APPLETS="addgroup adduser arp arping blkid delgroup deluser dmesg
-fbset fdisk fsck fsync ftpd ftpget ftpput fuser getty halt httpd hwclock
-ifconfig ifdown ifup init insmod ip ipaddr ipcalc ipcrm ipcs kill killall
-klogd logger login logread losetup lsmod mdev modinfo modprobe mount
-poweroff reboot rmmod depmod umount"
+# Derive the full applet list from the built binary so the rootfs always exposes
+# exactly the applets that were compiled in (no hand-maintained list to drift).
+ALL_APPLETS=$("$INSTALL_DIR/bin/rustfs" --help 2>&1 \
+    | sed -n '/Available applets:/,$p' | tail -n +2 \
+    | tr ',' ' ' | tr -s ' \t\n' '\n' | sed '/^$/d' | sort -u)
+if [ -z "$ALL_APPLETS" ]; then
+    echo "WARNING: could not read applet list from binary; falling back to sbin set only" >&2
+fi
 
 bin_count=0
-for applet in $BIN_APPLETS; do
-    ln -sf rustfs "$INSTALL_DIR/bin/$applet"
-    bin_count=$((bin_count + 1))
+sbin_count=0
+for applet in $ALL_APPLETS; do
+    if echo " $SBIN_APPLETS " | grep -q " $applet "; then
+        ln -sf ../bin/rustfs "$INSTALL_DIR/sbin/$applet"
+        sbin_count=$((sbin_count + 1))
+    else
+        ln -sf rustfs "$INSTALL_DIR/bin/$applet"
+        bin_count=$((bin_count + 1))
+    fi
 done
 
-sbin_count=0
+# sbin aliases that may not appear in --help but are accepted by the binary
 for applet in $SBIN_APPLETS; do
-    ln -sf ../bin/rustfs "$INSTALL_DIR/sbin/$applet"
-    sbin_count=$((sbin_count + 1))
+    [ -e "$INSTALL_DIR/sbin/$applet" ] || ln -sf ../bin/rustfs "$INSTALL_DIR/sbin/$applet"
 done
 
 echo "  $bin_count applets -> bin/"

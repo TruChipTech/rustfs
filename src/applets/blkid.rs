@@ -106,11 +106,10 @@ fn print_device_info(device: &str) -> i32 {
     }
 
     // Check for swap signature
-    if fstype.is_empty() && data.len() >= 4096 + 10 {
-        if &data[4086..4096] == b"SWAPSPACE2" || &data[4086..4096] == b"SWAP-SPACE" {
+    if fstype.is_empty() && data.len() >= 4096 + 10
+        && (&data[4086..4096] == b"SWAPSPACE2" || &data[4086..4096] == b"SWAP-SPACE") {
             fstype = "swap".to_string();
         }
-    }
 
     if fstype.is_empty() {
         return 2; // Not identified

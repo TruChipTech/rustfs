@@ -160,6 +160,7 @@
     <a href="#network">Networking</a>
     <a href="#archives">Archives and compression</a>
     <a href="#disk">Disk and filesystem</a>
+    <a href="#boot">Boot and kernel</a>
     <a href="#ipc">IPC and logging</a>
   </div>
 </header>
@@ -404,6 +405,19 @@ ln -s rustfs ls
     </table>
   </section>
 
+  <section id="boot" class="panel">
+    <h2>Boot and Kernel</h2>
+    <p class="small">These applets handle the late stages of early boot: jumping into a new kernel and handing control from the initramfs to the real root filesystem. Both require root (typically run as PID 1 inside an initramfs).</p>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>chroot</code></td><td>Run a command with a different root directory. Calls <code>chroot(2)</code>, changes the working directory to the new root, then execs COMMAND (defaults to <code>/bin/sh -i</code>). Must be run as root.</td><td><code>chroot NEWROOT [COMMAND [ARG]...]</code></td></tr>
+        <tr><td><code>kexec</code></td><td>Load and boot into a new kernel without a firmware reboot. Loading uses the <code>kexec_file_load(2)</code> syscall; booting uses <code>reboot(LINUX_REBOOT_CMD_KEXEC)</code>.</td><td><code>kexec -l KERNEL [--initrd=FILE] [--append=CMDLINE]</code><br><code>kexec -u</code> (unload) &nbsp; <code>kexec -e</code> (boot loaded kernel)<br><code>kexec -f KERNEL ...</code> (load and boot in one step)</td></tr>
+        <tr><td><code>switch_root</code></td><td>Free the initramfs and switch to the real root filesystem. Recursively deletes the initramfs contents (staying on the rootfs), moves NEW_ROOT to <code>/</code>, chroots into it, and execs INIT as the new PID 1. Must run as PID 1.</td><td><code>switch_root [-c /dev/console] NEW_ROOT INIT [ARGS...]</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
   <section id="ipc" class="panel">
     <h2>IPC and Logging</h2>
     <table>
@@ -443,6 +457,96 @@ ln -s rustfs ls
     </div>
   </section>
 
+  <section id="v120" class="panel">
+    <h2>New in v1.2.0 (BusyBox parity)</h2>
+    <p class="small">The following applets were added for broader BusyBox compatibility. Aliases reuse an existing applet: <code>egrep</code>/<code>fgrep</code> map to <code>grep -E</code>/<code>grep -F</code>, and <code>zcat</code> maps to <code>gunzip -c</code>.</p>
+
+    <h3>Text and Encoding</h3>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>egrep</code></td><td>Extended-regex grep (alias for <code>grep -E</code>).</td><td><code>egrep PATTERN [FILE]...</code></td></tr>
+        <tr><td><code>fgrep</code></td><td>Fixed-string grep (alias for <code>grep -F</code>).</td><td><code>fgrep STRING [FILE]...</code></td></tr>
+        <tr><td><code>zcat</code></td><td>Decompress gzip data to stdout (alias for <code>gunzip -c</code>).</td><td><code>zcat [FILE]...</code></td></tr>
+        <tr><td><code>comm</code></td><td>Compare two sorted files line by line.</td><td><code>comm [-123] FILE1 FILE2</code></td></tr>
+        <tr><td><code>cal</code></td><td>Display a calendar.</td><td><code>cal [MONTH] [YEAR]</code></td></tr>
+        <tr><td><code>cksum</code></td><td>POSIX CRC checksum and byte count.</td><td><code>cksum [FILE]...</code></td></tr>
+        <tr><td><code>sum</code></td><td>BSD/SysV checksum and block count.</td><td><code>sum [-r|-s] [FILE]...</code></td></tr>
+        <tr><td><code>expand</code></td><td>Convert tabs to spaces.</td><td><code>expand [-t N] [FILE]...</code></td></tr>
+        <tr><td><code>unexpand</code></td><td>Convert spaces to tabs.</td><td><code>unexpand [-a] [-t N] [FILE]...</code></td></tr>
+        <tr><td><code>split</code></td><td>Split a file into pieces.</td><td><code>split [-l N|-b SIZE] [FILE [PREFIX]]</code></td></tr>
+        <tr><td><code>uuencode</code></td><td>Encode a file (uu or base64).</td><td><code>uuencode [-m] [INFILE] NAME</code></td></tr>
+        <tr><td><code>uudecode</code></td><td>Decode a uuencoded file.</td><td><code>uudecode [-o OUTFILE] [FILE]</code></td></tr>
+        <tr><td><code>unix2dos</code></td><td>Convert Unix line endings to DOS.</td><td><code>unix2dos [FILE]...</code></td></tr>
+        <tr><td><code>dc</code></td><td>Reverse-polish desk calculator.</td><td><code>dc [-e EXPR] [-f FILE]</code></td></tr>
+        <tr><td><code>sha1sum</code></td><td>Compute and check SHA1 digests.</td><td><code>sha1sum [-c] [FILE]...</code></td></tr>
+        <tr><td><code>sha512sum</code></td><td>Compute and check SHA512 digests.</td><td><code>sha512sum [-c] [FILE]...</code></td></tr>
+        <tr><td><code>dnsdomainname</code></td><td>Show the DNS domain part of the FQDN.</td><td><code>dnsdomainname</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Process and Scheduling</h3>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>pidof</code></td><td>Find the PID(s) of a running program.</td><td><code>pidof [-s] [-o PID] NAME...</code></td></tr>
+        <tr><td><code>pgrep</code></td><td>Look up processes by name pattern.</td><td><code>pgrep [-l] [-f] [-x] [-v] PATTERN</code></td></tr>
+        <tr><td><code>pkill</code></td><td>Signal processes by name pattern.</td><td><code>pkill [-SIGNAL] [-f] PATTERN</code></td></tr>
+        <tr><td><code>killall5</code></td><td>Send a signal to all processes (SysV style).</td><td><code>killall5 [-SIGNAL] [-o PID]</code></td></tr>
+        <tr><td><code>setsid</code></td><td>Run a program in a new session.</td><td><code>setsid [-c] PROGRAM [ARGS]</code></td></tr>
+        <tr><td><code>usleep</code></td><td>Pause for N microseconds.</td><td><code>usleep N</code></td></tr>
+        <tr><td><code>nice</code></td><td>Run a program with modified priority.</td><td><code>nice [-n ADJ] [COMMAND]</code></td></tr>
+        <tr><td><code>renice</code></td><td>Alter priority of running processes.</td><td><code>renice [-n] PRIO [-p|-g|-u] ID...</code></td></tr>
+        <tr><td><code>ionice</code></td><td>Get/set I/O scheduling class.</td><td><code>ionice [-c CLASS] [-n PRIO] [-p PID] [COMMAND]</code></td></tr>
+        <tr><td><code>chrt</code></td><td>Manipulate real-time scheduling attributes.</td><td><code>chrt [-f|-r|-o|-b|-i] PRIO {COMMAND|-p PID}</code></td></tr>
+        <tr><td><code>taskset</code></td><td>Set or get a process's CPU affinity.</td><td><code>taskset MASK {COMMAND|-p PID}</code></td></tr>
+        <tr><td><code>time</code></td><td>Run a program and report how long it took.</td><td><code>time COMMAND [ARGS]</code></td></tr>
+        <tr><td><code>watch</code></td><td>Run a program periodically, fullscreen.</td><td><code>watch [-n SEC] [-t] COMMAND</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Session, Terminal, and Mounts</h3>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>who</code></td><td>Show who is logged on (parses utmp).</td><td><code>who</code>, <code>who am i</code></td></tr>
+        <tr><td><code>mesg</code></td><td>Control write access to your terminal.</td><td><code>mesg [y|n]</code></td></tr>
+        <tr><td><code>ttysize</code></td><td>Print terminal width and height.</td><td><code>ttysize [w] [h]</code></td></tr>
+        <tr><td><code>mountpoint</code></td><td>Test whether a directory is a mountpoint.</td><td><code>mountpoint [-q] [-d] DIR</code></td></tr>
+        <tr><td><code>pivot_root</code></td><td>Change the root filesystem.</td><td><code>pivot_root NEW_ROOT PUT_OLD</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Disk, Device, and Kernel</h3>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>mknod</code></td><td>Make block or character special files.</td><td><code>mknod [-m MODE] NAME TYPE [MAJOR MINOR]</code></td></tr>
+        <tr><td><code>mkfifo</code></td><td>Make FIFOs (named pipes).</td><td><code>mkfifo [-m MODE] NAME...</code></td></tr>
+        <tr><td><code>devmem</code></td><td>Read or write physical memory via <code>/dev/mem</code>.</td><td><code>devmem ADDRESS [WIDTH [VALUE]]</code></td></tr>
+        <tr><td><code>eject</code></td><td>Eject removable media.</td><td><code>eject [-t] [DEVICE]</code></td></tr>
+        <tr><td><code>freeramdisk</code></td><td>Free memory used by a ramdisk.</td><td><code>freeramdisk DEVICE</code></td></tr>
+        <tr><td><code>swapon</code></td><td>Enable swap devices/files.</td><td><code>swapon [-a] [DEVICE...]</code></td></tr>
+        <tr><td><code>swapoff</code></td><td>Disable swap devices/files.</td><td><code>swapoff [-a] [DEVICE...]</code></td></tr>
+        <tr><td><code>sysctl</code></td><td>Configure kernel parameters via <code>/proc/sys</code>.</td><td><code>sysctl [-a] [-w] KEY[=VALUE]</code>, <code>sysctl -p [FILE]</code></td></tr>
+        <tr><td><code>findfs</code></td><td>Find a filesystem device by label or UUID.</td><td><code>findfs LABEL=&lt;l&gt;|UUID=&lt;u&gt;</code></td></tr>
+        <tr><td><code>mkswap</code></td><td>Set up a Linux swap area (v1 header).</td><td><code>mkswap DEVICE [SIZE_KiB]</code></td></tr>
+        <tr><td><code>rdev</code></td><td>Query the device of the mounted root filesystem.</td><td><code>rdev</code></td></tr>
+        <tr><td><code>lsattr</code></td><td>List ext2/3/4 file attributes.</td><td><code>lsattr [FILE]...</code></td></tr>
+        <tr><td><code>chattr</code></td><td>Change ext2/3/4 file attributes.</td><td><code>chattr [+-=][aAcdijsStT] FILE...</code></td></tr>
+        <tr><td><code>fdformat</code></td><td>Low-level format a floppy disk.</td><td><code>fdformat [-n] DEVICE</code></td></tr>
+        <tr><td><code>hdparm</code></td><td>Get/set hard disk parameters (common subset).</td><td><code>hdparm [-g] [--getsz] [-r] [-z] DEVICE...</code></td></tr>
+        <tr><td><code>flash_lock</code></td><td>Lock MTD flash regions.</td><td><code>flash_lock MTD-DEVICE [OFFSET [BLOCKS]]</code></td></tr>
+        <tr><td><code>flash_unlock</code></td><td>Unlock MTD flash regions.</td><td><code>flash_unlock MTD-DEVICE [OFFSET [BLOCKS]]</code></td></tr>
+        <tr><td><code>readprofile</code></td><td>Read kernel profiling info from <code>/proc/profile</code>.</td><td><code>readprofile [-m MAP] [-p PROFILE] [-r] [-i]</code></td></tr>
+        <tr><td><code>rtcwake</code></td><td>Enter a sleep state until an RTC wakeup time.</td><td><code>rtcwake [-d rtc0] [-m MODE] -s SECONDS</code></td></tr>
+        <tr><td><code>adjtimex</code></td><td>Read or set kernel time variables.</td><td><code>adjtimex [-p] [-o OFF] [-f FREQ] [-t TICK]</code></td></tr>
+        <tr><td><code>raidautorun</code></td><td>Tell the kernel to auto-start RAID arrays.</td><td><code>raidautorun [DEVICE]</code></td></tr>
+        <tr><td><code>fdflush</code></td><td>Drop the kernel's cached view of a floppy.</td><td><code>fdflush DEVICE</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
   <section class="panel">
     <h2>How To Read Arguments</h2>
     <div class="grid">
@@ -466,7 +570,7 @@ ln -s rustfs ls
   </section>
 </main>
 <footer>
-  RustFS v1.1.0 — manual generated for the current repository state. For exact behavior, prefer the inline help shown by each applet when available.
+  RustFS v1.2.0 — manual generated for the current repository state. For exact behavior, prefer the inline help shown by each applet when available.
 </footer>
 </body>
 </html>

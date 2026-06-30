@@ -75,7 +75,7 @@ pub fn run(args: &[String]) -> i32 {
 
     println!("\n--- {target} statistics ---");
     println!("{sent} packets transmitted, {received} packets received, {}% unanswered",
-        if sent > 0 { ((sent - received) * 100) / sent } else { 0 });
+        ((sent - received) * 100).checked_div(sent).unwrap_or(0));
 
     if received > 0 { 0 } else { 1 }
 }

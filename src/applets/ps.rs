@@ -12,8 +12,8 @@ pub fn run(args: &[String]) -> i32 {
     let mut full_fmt = false;
 
     for arg in args {
-        if arg.starts_with('-') {
-            for c in arg[1..].chars() {
+        if let Some(flags) = arg.strip_prefix('-') {
+            for c in flags.chars() {
                 match c {
                     'e' | 'A' | 'a' | 'x' => show_all = true,
                     'f' | 'u' => full_fmt = true,
@@ -36,9 +36,9 @@ pub fn run(args: &[String]) -> i32 {
     pids.sort_unstable();
 
     if full_fmt {
-        println!("{:<10} {:>7} {:>7}  {:<5}  {:>8}  {}", "USER", "PID", "PPID", "STAT", "TIME", "COMMAND");
+        println!("{:<10} {:>7} {:>7}  {:<5}  {:>8}  COMMAND", "USER", "PID", "PPID", "STAT", "TIME");
     } else {
-        println!("{:>7} {:<8} {:>9} {:<5} {}", "PID", "USER", "VSZ", "STAT", "COMMAND");
+        println!("{:>7} {:<8} {:>9} {:<5} COMMAND", "PID", "USER", "VSZ", "STAT");
     }
 
     for pid in &pids {

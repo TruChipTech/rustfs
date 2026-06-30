@@ -76,7 +76,7 @@ pub fn run(args: &[String]) -> i32 {
 
         // ASCII part
         for &byte in chunk {
-            let c = if byte >= 0x20 && byte <= 0x7e {
+            let c = if (0x20..=0x7e).contains(&byte) {
                 byte as char
             } else {
                 '.'

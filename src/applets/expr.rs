@@ -135,8 +135,8 @@ fn evaluate(args: &[String]) -> Result<String, String> {
     }
 
     // Handle match / :
-    if args.len() >= 3 {
-        if args[1] == "match" || args[1] == ":" {
+    if args.len() >= 3
+        && (args[1] == "match" || args[1] == ":") {
             let string = &args[0];
             let pattern = &args[2];
             // Simple regex match
@@ -151,7 +151,6 @@ fn evaluate(args: &[String]) -> Result<String, String> {
                 Err(e) => return Err(format!("invalid pattern: {e}")),
             }
         }
-    }
 
     // Handle length
     if args.len() == 2 && args[0] == "length" {

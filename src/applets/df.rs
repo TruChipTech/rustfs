@@ -61,8 +61,8 @@ fn print_df_unix(human_readable: bool) {
     use std::fs;
 
     println!(
-        "{:<20} {:>12} {:>12} {:>12} {:>6} {}",
-        "Filesystem", "Size", "Used", "Available", "Use%", "Mounted on"
+        "{:<20} {:>12} {:>12} {:>12} {:>6} Mounted on",
+        "Filesystem", "Size", "Used", "Available", "Use%"
     );
 
     if let Ok(mounts) = fs::read_to_string("/proc/mounts") {

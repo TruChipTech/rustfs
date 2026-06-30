@@ -228,13 +228,12 @@ fn handle_hotplug_event() -> i32 {
     let rules = load_rules();
 
     match action.as_str() {
-        "add" => {
-            if !major.is_empty() && !minor.is_empty() {
+        "add"
+            if !major.is_empty() && !minor.is_empty() => {
                 let dev_num = format!("{major}:{minor}");
                 let is_block = subsystem == "block";
                 create_dev_node(&name, &dev_num, is_block, &rules);
             }
-        }
         "remove" => {
             let dev_path = format!("/dev/{name}");
             if Path::new(&dev_path).exists() {

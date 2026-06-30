@@ -8,12 +8,9 @@
 pub fn run(_args: &[String]) -> i32 {
     #[cfg(unix)]
     {
-        match std::env::var("USER") {
-            Ok(user) => {
-                println!("{user}");
-                return 0;
-            }
-            Err(_) => {}
+        if let Ok(user) = std::env::var("USER") {
+            println!("{user}");
+            return 0;
         }
         unsafe {
             let uid = libc::getuid();

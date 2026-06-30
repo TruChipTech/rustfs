@@ -29,15 +29,8 @@ pub fn run(args: &[String]) -> i32 {
         if parents {
             // Remove directory and its empty parents
             let mut path = std::path::PathBuf::from(dir);
-            loop {
-                match fs::remove_dir(&path) {
-                    Ok(()) => {}
-                    Err(_) => break,
-                }
-                if !path.pop() {
-                    break;
-                }
-                if path.as_os_str().is_empty() {
+            while fs::remove_dir(&path).is_ok() {
+                if !path.pop() || path.as_os_str().is_empty() {
                     break;
                 }
             }

@@ -71,6 +71,17 @@ pub fn run(args: &[String]) -> i32 {
                     before_context = n; after_context = n;
                 }
             }
+            // Attached-number forms: -A2, -B3, -C1
+            a if a.len() > 2 && a.starts_with("-A") && a[2..].chars().all(|c| c.is_ascii_digit()) => {
+                after_context = a[2..].parse().unwrap_or(0);
+            }
+            a if a.len() > 2 && a.starts_with("-B") && a[2..].chars().all(|c| c.is_ascii_digit()) => {
+                before_context = a[2..].parse().unwrap_or(0);
+            }
+            a if a.len() > 2 && a.starts_with("-C") && a[2..].chars().all(|c| c.is_ascii_digit()) => {
+                let n = a[2..].parse().unwrap_or(0);
+                before_context = n; after_context = n;
+            }
             "-e" | "--regexp" => {
                 i += 1;
                 if i < args.len() { patterns.push(args[i].clone()); pattern_set = true; }
@@ -258,13 +269,14 @@ pub fn run(args: &[String]) -> i32 {
                 if !printed.is_empty() && start > *printed.iter().max().unwrap_or(&0) + 1 {
                     println!("--");
                 }
-                for j in start..end {
+                for (offset, line) in ctx_lines[start..end].iter().enumerate() {
+                    let j = start + offset;
                     if printed.contains(&j) { continue; }
                     printed.insert(j);
                     let sep = if j == idx { ':' } else { '-' };
                     if show_filename { print!("{file}{sep}"); }
                     if line_numbers  { print!("{}{sep}", j + 1); }
-                    println!("{}", ctx_lines[j]);
+                    println!("{line}");
                 }
             }
         }

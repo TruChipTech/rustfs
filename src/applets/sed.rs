@@ -88,8 +88,9 @@ pub fn run(args: &[String]) -> i32 {
         for line in stdin.lock().lines() {
             match line {
                 Ok(l) => {
-                    let result = apply_commands(&l, &commands);
-                    if !quiet { let _ = writeln!(out, "{result}"); }
+                    if apply_commands(&l, &commands, quiet, &mut out) {
+                        break;
+                    }
                 }
                 Err(_) => break,
             }
@@ -98,11 +99,15 @@ pub fn run(args: &[String]) -> i32 {
         for file in &files {
             match fs::read_to_string(file) {
                 Ok(content) => {
-                    let mut output = String::new();
+                    let mut output: Vec<u8> = Vec::new();
+                    let mut quit = false;
                     for line in content.lines() {
-                        let result = apply_commands(line, &commands);
-                        if !quiet { output.push_str(&result); output.push('\n'); }
+                        if apply_commands(line, &commands, quiet, &mut output) {
+                            quit = true;
+                            break;
+                        }
                     }
+                    let output = String::from_utf8_lossy(&output).into_owned();
 
                     if in_place {
                         if !in_place_sfx.is_empty() {
@@ -125,6 +130,10 @@ pub fn run(args: &[String]) -> i32 {
                     } else {
                         print!("{output}");
                     }
+
+                    if quit {
+                        break;
+                    }
                 }
                 Err(e) => {
                     eprintln!("sed: {file}: {e}");
@@ -138,7 +147,7 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 enum SedCommand {
-    Substitute { pattern: Regex, replacement: String, global: bool },
+    Substitute { pattern: Regex, replacement: String, global: bool, print: bool },
     Delete     { pattern: Option<Regex> },
     Print      { pattern: Option<Regex> },
     Append     { pattern: Option<Regex>, text: String },
@@ -159,6 +168,7 @@ fn parse_sed_expr(expr: &str) -> Option<SedCommand> {
         let (pattern, replacement) = (parts[0], parts[1]);
         let flags = if parts.len() > 2 { parts[2] } else { "" };
         let global = flags.contains('g');
+        let print = flags.contains('p');
         let case_ins = flags.contains('i') || flags.contains('I');
         let regex_pat = if case_ins { format!("(?i){pattern}") } else { pattern.to_string() };
         let re = Regex::new(&regex_pat).ok()?;
@@ -166,6 +176,7 @@ fn parse_sed_expr(expr: &str) -> Option<SedCommand> {
             pattern: re,
             replacement: replacement.to_string(),
             global,
+            print,
         });
     }
 
@@ -173,10 +184,10 @@ fn parse_sed_expr(expr: &str) -> Option<SedCommand> {
     if expr == "p" { return Some(SedCommand::Print  { pattern: None }); }
 
     // /pattern/d  /pattern/p  /pattern/q
-    if expr.starts_with('/') {
-        let end = expr[1..].find('/')? + 1;
-        let inner = &expr[1..end];
-        let cmd = expr[end + 1..].trim();
+    if let Some(rest) = expr.strip_prefix('/') {
+        let end = rest.find('/')?;
+        let inner = &rest[..end];
+        let cmd = rest[end + 1..].trim();
         let re = Regex::new(inner).ok()?;
         return match cmd {
             "d" => Some(SedCommand::Delete { pattern: Some(re) }),
@@ -187,48 +198,67 @@ fn parse_sed_expr(expr: &str) -> Option<SedCommand> {
     }
 
     // a\TEXT or a TEXT (append text after current line)
-    if expr.starts_with('a') {
-        let text = expr[1..].trim_start_matches('\\').trim().to_string();
+    if let Some(rest) = expr.strip_prefix('a') {
+        let text = rest.trim_start_matches('\\').trim().to_string();
         return Some(SedCommand::Append { pattern: None, text });
     }
 
     None
 }
 
-fn apply_commands(line: &str, commands: &[SedCommand]) -> String {
-    let mut result = line.to_string();
+/// Process one input line through the command list, writing any output to
+/// `out`. Returns `true` if processing should stop (the `q` command).
+///
+/// Output model follows sed's: the pattern space is auto-printed at the end of
+/// the cycle unless `-n` (quiet) is set or the line was deleted. The `p`
+/// command and the `p` flag on `s///` emit an extra copy immediately,
+/// regardless of `-n`.
+fn apply_commands(line: &str, commands: &[SedCommand], quiet: bool, out: &mut impl Write) -> bool {
+    let mut space = line.to_string();
+    let mut deleted = false;
+    let mut quit = false;
+    let mut immediate: Vec<String> = Vec::new();
+    let mut append_after: Vec<String> = Vec::new();
 
     for cmd in commands {
         match cmd {
-            SedCommand::Substitute { pattern, replacement, global } => {
-                result = if *global {
-                    pattern.replace_all(&result, replacement.as_str()).into_owned()
+            SedCommand::Substitute { pattern, replacement, global, print } => {
+                let new = if *global {
+                    pattern.replace_all(&space, replacement.as_str()).into_owned()
                 } else {
-                    pattern.replace(&result, replacement.as_str()).into_owned()
+                    pattern.replace(&space, replacement.as_str()).into_owned()
                 };
-            }
-            SedCommand::Delete { pattern } => {
-                let del = match pattern { Some(re) => re.is_match(&result), None => true };
-                if del { return String::new(); }
-            }
-            SedCommand::Print { pattern } => {
-                let do_print = match pattern { Some(re) => re.is_match(&result), None => true };
-                if do_print { println!("{result}"); }
-            }
-            SedCommand::Append { pattern, text } => {
-                let do_it = match pattern { Some(re) => re.is_match(&result), None => true };
-                if do_it {
-                    println!("{result}");
-                    println!("{text}");
-                    return String::new();
+                let changed = new != space;
+                space = new;
+                if *print && changed {
+                    immediate.push(space.clone());
                 }
             }
-            SedCommand::Quit => {
-                println!("{result}");
-                std::process::exit(0);
+            SedCommand::Delete { pattern } => {
+                let del = match pattern { Some(re) => re.is_match(&space), None => true };
+                if del { deleted = true; break; }
             }
+            SedCommand::Print { pattern } => {
+                let do_print = match pattern { Some(re) => re.is_match(&space), None => true };
+                if do_print { immediate.push(space.clone()); }
+            }
+            SedCommand::Append { pattern, text } => {
+                let do_it = match pattern { Some(re) => re.is_match(&space), None => true };
+                if do_it { append_after.push(text.clone()); }
+            }
+            SedCommand::Quit => { quit = true; break; }
         }
     }
 
-    result
+    for p in &immediate {
+        let _ = writeln!(out, "{p}");
+    }
+    if !quiet && !deleted {
+        let _ = writeln!(out, "{space}");
+    }
+    for a in &append_after {
+        let _ = writeln!(out, "{a}");
+    }
+
+    quit
 }

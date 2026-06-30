@@ -12,8 +12,8 @@ pub fn run(args: &[String]) -> i32 {
     let mut utc = false;
 
     for arg in args {
-        if arg.starts_with('+') {
-            format = Some(arg[1..].to_string());
+        if let Some(f) = arg.strip_prefix('+') {
+            format = Some(f.to_string());
         } else if arg == "-u" || arg == "--utc" {
             utc = true;
         }

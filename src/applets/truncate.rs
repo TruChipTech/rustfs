@@ -119,10 +119,10 @@ fn parse_size_str(s: &str) -> Option<u64> {
     if s.is_empty() { return None; }
     let (num, mult): (&str, u64) = if s.ends_with("KB") || s.ends_with("kB") {
         (&s[..s.len()-2], 1000)
-    } else if s.ends_with("MB") {
-        (&s[..s.len()-2], 1_000_000)
-    } else if s.ends_with("GB") {
-        (&s[..s.len()-2], 1_000_000_000)
+    } else if let Some(p) = s.strip_suffix("MB") {
+        (p, 1_000_000)
+    } else if let Some(p) = s.strip_suffix("GB") {
+        (p, 1_000_000_000)
     } else if s.ends_with('K') || s.ends_with('k') {
         (&s[..s.len()-1], 1024)
     } else if s.ends_with('M') || s.ends_with('m') {

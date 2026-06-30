@@ -105,14 +105,14 @@ pub fn run(args: &[String]) -> i32 {
 
 fn parse_duration(s: &str) -> Option<f64> {
     if s.is_empty() { return None; }
-    let (num, mult) = if s.ends_with('s') {
-        (&s[..s.len()-1], 1.0f64)
-    } else if s.ends_with('m') {
-        (&s[..s.len()-1], 60.0)
-    } else if s.ends_with('h') {
-        (&s[..s.len()-1], 3600.0)
-    } else if s.ends_with('d') {
-        (&s[..s.len()-1], 86400.0)
+    let (num, mult) = if let Some(p) = s.strip_suffix('s') {
+        (p, 1.0f64)
+    } else if let Some(p) = s.strip_suffix('m') {
+        (p, 60.0)
+    } else if let Some(p) = s.strip_suffix('h') {
+        (p, 3600.0)
+    } else if let Some(p) = s.strip_suffix('d') {
+        (p, 86400.0)
     } else {
         (s, 1.0)
     };

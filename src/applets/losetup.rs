@@ -110,7 +110,8 @@ fn show_all_loops() -> i32 {
 
 fn find_free_loop() -> Option<String> {
     // Use LOOP_CTL_GET_FREE ioctl
-    let fd = unsafe { libc::open(b"/dev/loop-control\0".as_ptr() as *const _, libc::O_RDWR) };
+    let path = c"/dev/loop-control";
+    let fd = unsafe { libc::open(path.as_ptr(), libc::O_RDWR) };
     if fd < 0 { return None; }
 
     const LOOP_CTL_GET_FREE: libc::c_ulong = 0x4C82;

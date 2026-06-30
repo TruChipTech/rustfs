@@ -99,11 +99,10 @@ fn down_all_interfaces() -> i32 {
     for line in content.lines().skip(2) {
         if let Some(colon_pos) = line.find(':') {
             let iface = line[..colon_pos].trim();
-            if iface != "lo" {
-                if bring_down(iface, false) != 0 {
+            if iface != "lo"
+                && bring_down(iface, false) != 0 {
                     exit_code = 1;
                 }
-            }
         }
     }
     exit_code

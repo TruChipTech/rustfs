@@ -42,7 +42,7 @@ pub fn run(args: &[String]) -> i32 {
 
         if path.is_file() {
             let size = path.metadata().map(|m| m.len()).unwrap_or(0);
-            let blocks = (size + 1023) / 1024;
+            let blocks = size.div_ceil(1024);
             grand_total += blocks;
             print_size(blocks, p, human_readable);
             continue;
@@ -55,7 +55,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(e) => {
                     if let Ok(meta) = e.metadata() {
                         let size = meta.len();
-                        let blocks = (size + 1023) / 1024;
+                        let blocks = size.div_ceil(1024);
 
                         if !summarize && e.path().is_dir() {
                             // Calculate directory subtotal
@@ -64,7 +64,7 @@ pub fn run(args: &[String]) -> i32 {
                                 .into_iter()
                                 .filter_map(|ee| ee.ok())
                                 .filter_map(|ee| ee.metadata().ok())
-                                .map(|m| (m.len() + 1023) / 1024)
+                                .map(|m| m.len().div_ceil(1024))
                                 .sum();
                             print_size(sub, &e.path().display().to_string(), human_readable);
                         }

@@ -181,7 +181,7 @@ fn is_loaded(name: &str) -> bool {
         content.lines().any(|line| {
             line.split_whitespace()
                 .next()
-                .map_or(false, |m| m == normalized)
+                .is_some_and(|m| m == normalized)
         })
     } else {
         false
@@ -243,6 +243,7 @@ fn find_module_file(mod_dir: &str, name: &str) -> Option<String> {
     find_module_recursive(Path::new(mod_dir), mod_dir, &normalized)
 }
 
+#[allow(clippy::only_used_in_recursion)]
 fn find_module_recursive(dir: &Path, base: &str, name: &str) -> Option<String> {
     let entries = fs::read_dir(dir).ok()?;
     for entry in entries.flatten() {

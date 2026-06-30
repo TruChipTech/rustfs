@@ -50,7 +50,7 @@ fn list_archive(archive: &str) -> i32 {
     let mut offset = AR_MAGIC.len();
     while offset + 60 <= data.len() {
         let header = &data[offset..offset + 60];
-        let name = std::str::from_utf8(&header[0..16]).unwrap_or("").trim_end_matches(|c: char| c == ' ' || c == '/');
+        let name = std::str::from_utf8(&header[0..16]).unwrap_or("").trim_end_matches([' ', '/']);
         let size_str = std::str::from_utf8(&header[48..58]).unwrap_or("").trim();
         let size: usize = size_str.parse().unwrap_or(0);
 
@@ -59,7 +59,7 @@ fn list_archive(archive: &str) -> i32 {
         }
 
         offset += 60 + size;
-        if offset % 2 != 0 { offset += 1; }
+        if !offset.is_multiple_of(2) { offset += 1; }
     }
     0
 }
@@ -80,7 +80,7 @@ fn extract_archive(archive: &str, files: &[String]) -> i32 {
 
     while offset + 60 <= data.len() {
         let header = &data[offset..offset + 60];
-        let name = std::str::from_utf8(&header[0..16]).unwrap_or("").trim_end_matches(|c: char| c == ' ' || c == '/');
+        let name = std::str::from_utf8(&header[0..16]).unwrap_or("").trim_end_matches([' ', '/']);
         let size_str = std::str::from_utf8(&header[48..58]).unwrap_or("").trim();
         let size: usize = size_str.parse().unwrap_or(0);
 
@@ -95,7 +95,7 @@ fn extract_archive(archive: &str, files: &[String]) -> i32 {
         }
 
         offset += 60 + size;
-        if offset % 2 != 0 { offset += 1; }
+        if !offset.is_multiple_of(2) { offset += 1; }
     }
     exit_code
 }

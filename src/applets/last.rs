@@ -7,6 +7,7 @@
  */
 //! last — show listing of last logged in users
 
+use chrono::TimeZone;
 use std::fs;
 
 pub fn run(args: &[String]) -> i32 {
@@ -103,18 +104,8 @@ fn extract_string(bytes: &[u8]) -> String {
 
 fn format_time(timestamp: i64) -> String {
     if timestamp == 0 { return String::new(); }
-    // Use libc localtime
-    let t = timestamp as libc::time_t;
-    let tm = unsafe { libc::localtime(&t) };
-    if tm.is_null() { return format!("{timestamp}"); }
-    let tm = unsafe { &*tm };
-
-    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-    format!("{} {} {:2} {:02}:{:02}",
-        days[tm.tm_wday as usize % 7],
-        months[tm.tm_mon as usize % 12],
-        tm.tm_mday, tm.tm_hour, tm.tm_min)
+    match chrono::Local::now().timezone().timestamp_opt(timestamp, 0).single() {
+        Some(dt) => dt.format("%a %b %e %H:%M").to_string(),
+        None => format!("{timestamp}"),
+    }
 }

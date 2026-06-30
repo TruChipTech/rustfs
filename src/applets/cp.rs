@@ -100,6 +100,7 @@ pub fn run(args: &[String]) -> i32 {
     exit_code
 }
 
+#[allow(clippy::only_used_in_recursion)]
 fn copy_item(
     src: &Path,
     dest: &Path,

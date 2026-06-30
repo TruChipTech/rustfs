@@ -71,8 +71,8 @@ pub fn run(args: &[String]) -> i32 {
             for &(start, end) in &fields {
                 let s = start.saturating_sub(1);
                 let e = end.unwrap_or(start).min(chars.len());
-                for idx in s..e {
-                    selected[idx] = true;
+                if s < e {
+                    selected[s..e].iter_mut().for_each(|sel| *sel = true);
                 }
             }
 
@@ -101,8 +101,8 @@ pub fn run(args: &[String]) -> i32 {
             for &(start, end) in &fields {
                 let s = start.saturating_sub(1);
                 let e = end.unwrap_or(start).min(parts.len());
-                for idx in s..e {
-                    selected_indices[idx] = true;
+                if s < e {
+                    selected_indices[s..e].iter_mut().for_each(|sel| *sel = true);
                 }
             }
 

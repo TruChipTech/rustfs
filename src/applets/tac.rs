@@ -34,7 +34,7 @@ pub fn run(args: &[String]) -> i32 {
 fn tac_file(file: &str) -> i32 {
     let lines: Vec<String> = if file == "-" {
         let stdin = io::stdin();
-        stdin.lock().lines().filter_map(|l| l.ok()).collect()
+        stdin.lock().lines().map_while(Result::ok).collect()
     } else {
         match std::fs::read_to_string(file) {
             Ok(content) => content.lines().map(str::to_string).collect(),

@@ -11,7 +11,7 @@ A safe, correct, and fast multi-call binary implementing common Unix utilities i
 - **Proper UTF-8 Handling**: Gracefully handles invalid encodings instead of crashing
 - **Cross-platform**: Works on Linux, macOS, and Windows
 
-## Included Applets (120)
+## Included Applets (190+)
 
 ### Init System (mutually exclusive — one at a time)
 `init` — Linux init program (PID 1), selectable at build time:
@@ -53,11 +53,26 @@ A safe, correct, and fast multi-call binary implementing common Unix utilities i
 ### Disk / System Utilities
 `blkid` `clear` `dmesg` `fbset` `fdisk` `fsck` `fsync` `hwclock` `insmod` `klogd` `losetup` `lsmod`
 
+### Boot / Kernel
+`chroot` — run a command (or shell) with a different root directory
+`kexec` — load and boot into a new kernel without a firmware reboot (via `kexec_file_load(2)`)
+`switch_root` — free the initramfs and switch to the real root filesystem (the final step of an initramfs)
+
 ### IPC Utilities
 `ipcrm` `ipcs`
 
 ### Logging
 `logger` `logread`
+
+### BusyBox Parity Additions (v1.2.0)
+Text / encoding: `comm` `cal` `cksum` `sum` `expand` `unexpand` `split` `uuencode` `uudecode` `unix2dos` `dc` `sha1sum` `sha512sum` `dnsdomainname`
+Aliases: `egrep` (`grep -E`) `fgrep` (`grep -F`) `zcat` (`gunzip -c`)
+Process / scheduling: `pidof` `pgrep` `pkill` `killall5` `setsid` `usleep` `nice` `renice` `ionice` `chrt` `taskset` `time` `watch`
+Session / terminal / mounts: `who` `mesg` `ttysize` `mountpoint` `pivot_root`
+Disk / device / kernel: `mknod` `mkfifo` `devmem` `eject` `freeramdisk` `swapon` `swapoff` `sysctl` `findfs` `mkswap` `rdev` `lsattr` `chattr` `fdformat` `hdparm` `flash_lock` `flash_unlock` `readprofile` `rtcwake` `adjtimex` `raidautorun` `fdflush`
+
+> Note: additional BusyBox applets (networking tools, archivers, daemons, and
+> editors) are being added in later phases of the parity effort.
 
 ## Configuration (Kconfig)
 
@@ -66,6 +81,10 @@ RustFS uses a Kconfig-based build configuration system. Each applet and init sub
 ```bash
 # Load default config (all features enabled)
 ./configure.sh defconfig
+
+# Generate a complete config straight from Kconfig (every applet/feature;
+# cannot drift behind newly-added applets)
+./configure.sh allyesconfig
 
 # Load minimal config (init + essential applets only)
 ./configure.sh minimal
@@ -104,6 +123,38 @@ cargo build --release
 ```
 
 The binary is at `target/release/rustfs` (~1.5 MB stripped).
+
+### Optimizing for Size
+
+The release profile is tuned to produce the smallest practical binary — important
+when RustFS is the entire userland of an initramfs or embedded rootfs:
+
+| Setting | Effect |
+|---------|--------|
+| `opt-level = "z"` | Optimize aggressively for size over speed |
+| `lto = "fat"` | Whole-program link-time optimization across all crates |
+| `codegen-units = 1` | Single codegen unit for maximum cross-module size optimization |
+| `panic = "abort"` | Drops unwinding tables and landing pads |
+| `strip = true` | Strips symbols and debug info |
+| `overflow-checks = false` | Removes overflow-check branches in release |
+
+To shrink the binary further, disable applets you don't need via Kconfig
+(`./configure.sh menuconfig` or by editing `.config`) — each disabled applet is
+compiled out entirely. For the smallest possible image, start from the minimal
+config:
+
+```bash
+./configure.sh minimal
+cargo build --release
+```
+
+For fully static, dependency-free binaries (ideal for initramfs), build against
+musl with the bundled libbz2:
+
+```bash
+rustup target add x86_64-unknown-linux-musl
+cargo build --release --target x86_64-unknown-linux-musl --features static-bin
+```
 
 ## Cleaning Build Artifacts
 
@@ -329,9 +380,47 @@ exit
 
 The rootfs is configured with passwordless root login for testing. To set a root password, edit `_install/etc/shadow` and replace the empty field with a crypt hash, or boot and run `passwd` if available.
 
+### QEMU testing prerequisites
+
+> **Enable all applets first.** `./configure.sh defconfig` loads
+> `configs/default_defconfig`, which now enables every applet defined in
+> `Kconfig`. If you build without it (or with a stale `.config`), disabled
+> applets are *compiled out* and report `unknown applet` at runtime even though
+> they appear in `--help`.
+>
+> ```bash
+> ./configure.sh defconfig      # enable all features before building
+> ```
+>
+> **The rootfs needs applet symlinks + PATH.** RustFS is a multi-call binary and
+> its bundled `sh` has no shell builtins — it `exec`s external commands. The
+> rootfs must contain `/bin/rustfs`, a `/bin/<applet>` symlink per applet
+> (including `/bin/sh`), and `/init` must `export PATH=/bin`. `install.sh`
+> creates these symlinks.
+>
+> **Ready-to-boot kernels** (no need to build one) can be pulled from Debian's
+> netboot images — these are plain `bzImage`/`Image`/`zImage` files that boot a
+> custom initramfs directly:
+>
+> ```bash
+> base=http://deb.debian.org/debian/dists/stable/main
+> curl -o vmlinuz-amd64 "$base/installer-amd64/current/images/netboot/debian-installer/amd64/linux"
+> curl -o Image-arm64   "$base/installer-arm64/current/images/netboot/debian-installer/arm64/linux"
+> curl -o vmlinuz-armhf "$base/installer-armhf/current/images/netboot/vmlinuz"
+> curl -o Image-riscv64 "$base/installer-riscv64/current/images/netboot/debian-installer/riscv64/linux"
+> ```
+>
+> **Automated harness.** `qemu-test/run.sh <x86_64|arm64|arm32|riscv64>` builds
+> the target, packages a RustFS-only initramfs, boots it under `qemu-system-*`
+> (full-system, not qemu-user), runs ~121 applet tests in-guest and scores them.
+> Results are written to `qemu-test/work/results-<arch>.txt`.
+
 ### Testing with QEMU (x86_64)
 
 ```bash
+# 0. Enable all applets
+./configure.sh defconfig
+
 # 1. Build and install rootfs
 cargo build --release
 sudo ./install.sh
@@ -415,6 +504,36 @@ qemu-system-aarch64 \
     -nographic \
     -m 512M \
     -no-reboot
+
+# To exit QEMU: Ctrl-A then X
+```
+
+### Testing with QEMU (RISC-V 64)
+
+RISC-V needs a cross C toolchain (for the bundled `bzip2` C code) and `libcrypt`.
+On Debian/Ubuntu hosts: `sudo apt install gcc-riscv64-linux-gnu`. If you cannot
+install system packages, the debs can be extracted into a local sysroot (see
+`qemu-test/run.sh` for the exact extraction used here).
+
+```bash
+# 1. Cross-compile (static; +crt-static so no riscv loader is needed in the rootfs)
+rustup target add riscv64gc-unknown-linux-gnu
+export CC_riscv64gc_unknown_linux_gnu=riscv64-linux-gnu-gcc
+export CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_GNU_LINKER=riscv64-linux-gnu-gcc
+export CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_GNU_RUSTFLAGS="-C target-feature=+crt-static -C link-arg=-static"
+cargo build --release --target riscv64gc-unknown-linux-gnu
+
+# 2. Rootfs + initramfs (as above, with the riscv64 binary)
+sudo BINARY=target/riscv64gc-unknown-linux-gnu/release/rustfs ./install.sh
+cd _install && find . | cpio -o -H newc | gzip > ../rootfs.cpio.gz && cd ..
+
+# 3. Boot with QEMU (virt machine uses the built-in OpenSBI firmware)
+qemu-system-riscv64 \
+    -M virt \
+    -kernel Image-riscv64 \
+    -initrd rootfs.cpio.gz \
+    -append "console=ttyS0 init=/init panic=1" \
+    -nographic -m 512M -no-reboot
 
 # To exit QEMU: Ctrl-A then X
 ```

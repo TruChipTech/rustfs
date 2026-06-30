@@ -66,13 +66,11 @@ pub fn run(args: &[String]) -> i32 {
         return 0;
     }
 
-    // Use stable sort to preserve relative order of equal elements
-    if stable || true {
-        // Always use stable sort
-        lines.sort_by(|a, b| {
-            compare_lines(a, b, numeric, ignore_case, key_field, separator)
-        });
-    }
+    // Always use a stable sort to preserve the relative order of equal elements.
+    let _ = stable;
+    lines.sort_by(|a, b| {
+        compare_lines(a, b, numeric, ignore_case, key_field, separator)
+    });
 
     if reverse {
         lines.reverse();

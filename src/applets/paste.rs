@@ -21,8 +21,8 @@ pub fn run(args: &[String]) -> i32 {
             if i < args.len() {
                 delimiter = args[i].clone();
             }
-        } else if arg.starts_with("-d") {
-            delimiter = arg[2..].to_string();
+        } else if let Some(d) = arg.strip_prefix("-d") {
+            delimiter = d.to_string();
         } else if arg == "-s" || arg == "--serial" {
             serial = true;
         } else if arg == "--help" {
@@ -64,13 +64,13 @@ pub fn run(args: &[String]) -> i32 {
                 let stdin = io::stdin();
                 BufReader::new(stdin.lock())
                     .lines()
-                    .filter_map(|l| l.ok())
+                    .map_while(Result::ok)
                     .collect()
             } else {
                 match File::open(f) {
                     Ok(file) => BufReader::new(file)
                         .lines()
-                        .filter_map(|l| l.ok())
+                        .map_while(Result::ok)
                         .collect(),
                     Err(e) => {
                         eprintln!("paste: {f}: {e}");
