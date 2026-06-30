@@ -483,3 +483,33 @@ pub fn input_lines(files: &[String]) -> Vec<String> {
     }
     lines
 }
+#[cfg(applet_catv)]
+pub mod catv;
+#[cfg(applet_more)]
+pub mod more;
+#[cfg(applet_run_parts)]
+pub mod run_parts;
+#[cfg(applet_runlevel)]
+pub mod runlevel;
+#[cfg(applet_pipe_progress)]
+pub mod pipe_progress;
+#[cfg(applet_volname)]
+pub mod volname;
+#[cfg(applet_mkpasswd)]
+pub mod mkpasswd;
+#[cfg(applet_cryptpw)]
+pub mod cryptpw;
+#[cfg(applet_reset)]
+pub mod reset;
+#[cfg(applet_beep)]
+pub mod beep;
+#[cfg(applet_setarch)]
+pub mod setarch;
+#[cfg(applet_chvt)]
+pub mod chvt;
+#[cfg(applet_deallocvt)]
+pub mod deallocvt;
+#[cfg(applet_kbd_mode)]
+pub mod kbd_mode;
+#[cfg(applet_rdate)]
+pub mod rdate;

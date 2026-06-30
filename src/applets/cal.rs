@@ -18,7 +18,7 @@ pub fn run(args: &[String]) -> i32 {
     let (month, year) = match nums.len() {
         0 => (now.month() as i32, now.year()),
         1 => {
-            // single arg is a year -> print whole year would be large; busybox
+            // single arg is a year -> print whole year would be large; the
             // treats single numeric arg as year. Print current month of that year.
             (now.month() as i32, nums[0])
         }

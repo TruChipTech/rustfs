@@ -2,11 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-07-01
+
+### Added
+- Extended applet set, phase 1 — 15 new applets (+ `linux32`/`linux64` aliases):
+  - **Console/VT:** `chvt`, `deallocvt`, `kbd_mode`, `reset`, `beep`.
+  - **Exec domain:** `setarch`, `linux32`, `linux64`.
+  - **Text/pager:** `catv`, `more`.
+  - **Misc:** `run-parts`, `runlevel`, `pipe_progress`, `volname`, `rdate`,
+    `mkpasswd`, `cryptpw`.
+- `./configure.sh allyesconfig` — generate a complete config directly from
+  Kconfig (every applet/feature), so it cannot drift behind newly-added applets.
+- `scripts/add_applet.sh` — wires a new applet into all integration points
+  (mod.rs, dispatch, help, Cargo check-cfg, Kconfig, defconfig, build.rs).
+- QEMU full-system test harness: `qemu-test/run.sh` and `qemu-test/run_matrix.sh`
+  boot a rustfs-only initramfs across x86_64/arm64/arm32/riscv64 and the full
+  `{release,debug} × {static,shared}` build matrix.
+
+### Fixed
+- `sh`: fixed a file-descriptor double-close in pipeline setup (the previous-pipe
+  read end was both moved into the child's `Stdio` and explicitly closed),
+  which aborted on debug builds and could corrupt pipelines.
+- VT/console applets: use portable `ioctl` request typing so musl targets build.
+- `kexec`: define the `kexec_file_load` syscall number for riscv64.
+- `configs/default_defconfig`: synced to all Kconfig applets so `defconfig`
+  enables every applet as documented.
+
+### Removed
+- Dropped third-party project name references from docs/comments in favor of
+  neutral wording.
+
 ## [1.2.0] - 2026-06-28
 
 ### Added
 - Added 3 new applets: `chroot`, `kexec`, `switch_root`.
-- Began a BusyBox parity effort, adding 56 new applets and 3 aliases:
+- Began an extended applet effort, adding 56 new applets and 3 aliases:
   - **Text/encoding:** `comm`, `cal`, `cksum`, `sum`, `expand`, `unexpand`,
     `split`, `uuencode`, `uudecode`, `unix2dos`, `dc`, `sha1sum`, `sha512sum`,
     `dnsdomainname`.

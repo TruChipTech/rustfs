@@ -319,7 +319,7 @@ fn main() {
         #[cfg(applet_sh)]
         "sh" | "ash" => applets::sh::run(&applet_args),
 
-        // New applets (BusyBox parity)
+        // New applets (extended coreutils set)
         #[cfg(applet_ps)]
         "ps" => applets::ps::run(&applet_args),
         #[cfg(applet_free)]
@@ -475,6 +475,40 @@ fn main() {
         #[cfg(applet_fdflush)]
         "fdflush" => applets::fdflush::run(&applet_args),
 
+        #[cfg(applet_catv)]
+        "catv" => applets::catv::run(&applet_args),
+        #[cfg(applet_more)]
+        "more" => applets::more::run(&applet_args),
+        #[cfg(applet_run_parts)]
+        "run-parts" => applets::run_parts::run(&applet_args),
+        #[cfg(applet_runlevel)]
+        "runlevel" => applets::runlevel::run(&applet_args),
+        #[cfg(applet_pipe_progress)]
+        "pipe_progress" => applets::pipe_progress::run(&applet_args),
+        #[cfg(applet_volname)]
+        "volname" => applets::volname::run(&applet_args),
+        #[cfg(applet_mkpasswd)]
+        "mkpasswd" => applets::mkpasswd::run(&applet_args),
+        #[cfg(applet_cryptpw)]
+        "cryptpw" => applets::cryptpw::run(&applet_args),
+        #[cfg(applet_reset)]
+        "reset" => applets::reset::run(&applet_args),
+        #[cfg(applet_beep)]
+        "beep" => applets::beep::run(&applet_args),
+        #[cfg(applet_setarch)]
+        "setarch" => applets::setarch::run(&applet_args),
+        #[cfg(applet_setarch)]
+        "linux32" => applets::setarch::run_linux32(&applet_args),
+        #[cfg(applet_setarch)]
+        "linux64" => applets::setarch::run_linux64(&applet_args),
+        #[cfg(applet_chvt)]
+        "chvt" => applets::chvt::run(&applet_args),
+        #[cfg(applet_deallocvt)]
+        "deallocvt" => applets::deallocvt::run(&applet_args),
+        #[cfg(applet_kbd_mode)]
+        "kbd_mode" => applets::kbd_mode::run(&applet_args),
+        #[cfg(applet_rdate)]
+        "rdate" => applets::rdate::run(&applet_args),
         // Help / meta
         "help" | "--help" | "-h" => {
             print_help();
@@ -562,6 +596,21 @@ fn print_help() {
         "sysctl", "findfs", "mkswap", "rdev", "lsattr", "chattr", "fdformat",
         "hdparm", "flash_lock", "flash_unlock", "readprofile", "rtcwake",
         "adjtimex", "raidautorun", "fdflush",
+        "catv",
+        "more",
+        "run-parts",
+        "runlevel",
+        "pipe_progress",
+        "volname",
+        "mkpasswd",
+        "cryptpw",
+        "reset",
+        "beep",
+        "setarch", "linux32", "linux64",
+        "chvt",
+        "deallocvt",
+        "kbd_mode",
+        "rdate",
     ];
     for line in applets.chunks(10) {
         println!("  {}", line.join(", "));

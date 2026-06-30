@@ -27,6 +27,21 @@ fn main() {
 
     // Emit cfg flags for each enabled config option
     let all_options = [
+        "APPLET_RDATE",
+        "APPLET_KBD_MODE",
+        "APPLET_DEALLOCVT",
+        "APPLET_CHVT",
+        "APPLET_SETARCH",
+        "APPLET_BEEP",
+        "APPLET_RESET",
+        "APPLET_CRYPTPW",
+        "APPLET_MKPASSWD",
+        "APPLET_VOLNAME",
+        "APPLET_PIPE_PROGRESS",
+        "APPLET_RUNLEVEL",
+        "APPLET_RUN_PARTS",
+        "APPLET_MORE",
+        "APPLET_CATV",
         "INIT",
         "INIT_RUSTFS",
         "INIT_SYSVINIT",

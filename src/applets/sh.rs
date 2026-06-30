@@ -600,6 +600,13 @@ impl Shell {
                 (None, None)
             };
 
+            // Whether prev_read's ownership is transferred to the child's Stdio
+            // below. When stdin is redirected from a file, prev_read is left
+            // untouched here and must be closed by the parent afterwards;
+            // otherwise Stdio::from_raw_fd takes ownership and closing it again
+            // would be a double-close.
+            let prev_read_consumed = redir.stdin_file.is_none() && prev_read.is_some();
+
             let stdin_cfg = if let Some(ref path) = redir.stdin_file {
                 match fs::File::open(path) {
                     Ok(f) => Stdio::from(f),
@@ -681,9 +688,13 @@ impl Shell {
 
             let child = cmd.spawn();
 
-            // Close the read end from previous pipe in parent
+            // Close the read end from the previous pipe in the parent — but only
+            // if it was not already handed to (and thus owned by) the child's
+            // Stdio above, which closes it on spawn.
             if let Some(fd) = prev_read {
-                unsafe { libc::close(fd) };
+                if !prev_read_consumed {
+                    unsafe { libc::close(fd) };
+                }
             }
 
             prev_read = pipe_read;

@@ -22,7 +22,7 @@ pub fn run(args: &[String]) -> i32 {
 
     let newroot = &args[0];
 
-    // Default command is an interactive shell, like coreutils/busybox chroot.
+    // Default command is an interactive shell, like coreutils chroot.
     let (command, command_args): (String, Vec<String>) = if args.len() > 1 {
         (args[1].clone(), args[2..].to_vec())
     } else {

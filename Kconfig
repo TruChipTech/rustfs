@@ -927,3 +927,93 @@ config APPLET_FDFLUSH
     default y
 
 endmenu
+
+config APPLET_CATV
+	bool "catv"
+	default y
+	help
+	  Enable the catv applet.
+
+config APPLET_MORE
+	bool "more"
+	default y
+	help
+	  Enable the more applet.
+
+config APPLET_RUN_PARTS
+	bool "run-parts"
+	default y
+	help
+	  Enable the run-parts applet.
+
+config APPLET_RUNLEVEL
+	bool "runlevel"
+	default y
+	help
+	  Enable the runlevel applet.
+
+config APPLET_PIPE_PROGRESS
+	bool "pipe_progress"
+	default y
+	help
+	  Enable the pipe_progress applet.
+
+config APPLET_VOLNAME
+	bool "volname"
+	default y
+	help
+	  Enable the volname applet.
+
+config APPLET_MKPASSWD
+	bool "mkpasswd"
+	default y
+	help
+	  Enable the mkpasswd applet.
+
+config APPLET_CRYPTPW
+	bool "cryptpw"
+	default y
+	help
+	  Enable the cryptpw applet.
+
+config APPLET_RESET
+	bool "reset"
+	default y
+	help
+	  Enable the reset applet.
+
+config APPLET_BEEP
+	bool "beep"
+	default y
+	help
+	  Enable the beep applet.
+
+config APPLET_SETARCH
+	bool "setarch"
+	default y
+	help
+	  Enable the setarch applet.
+
+config APPLET_CHVT
+	bool "chvt"
+	default y
+	help
+	  Enable the chvt applet.
+
+config APPLET_DEALLOCVT
+	bool "deallocvt"
+	default y
+	help
+	  Enable the deallocvt applet.
+
+config APPLET_KBD_MODE
+	bool "kbd_mode"
+	default y
+	help
+	  Enable the kbd_mode applet.
+
+config APPLET_RDATE
+	bool "rdate"
+	default y
+	help
+	  Enable the rdate applet.

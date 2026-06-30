@@ -64,14 +64,14 @@ A safe, correct, and fast multi-call binary implementing common Unix utilities i
 ### Logging
 `logger` `logread`
 
-### BusyBox Parity Additions (v1.2.0)
+### Extended Applet Additions (v1.2.0)
 Text / encoding: `comm` `cal` `cksum` `sum` `expand` `unexpand` `split` `uuencode` `uudecode` `unix2dos` `dc` `sha1sum` `sha512sum` `dnsdomainname`
 Aliases: `egrep` (`grep -E`) `fgrep` (`grep -F`) `zcat` (`gunzip -c`)
 Process / scheduling: `pidof` `pgrep` `pkill` `killall5` `setsid` `usleep` `nice` `renice` `ionice` `chrt` `taskset` `time` `watch`
 Session / terminal / mounts: `who` `mesg` `ttysize` `mountpoint` `pivot_root`
 Disk / device / kernel: `mknod` `mkfifo` `devmem` `eject` `freeramdisk` `swapon` `swapoff` `sysctl` `findfs` `mkswap` `rdev` `lsattr` `chattr` `fdformat` `hdparm` `flash_lock` `flash_unlock` `readprofile` `rtcwake` `adjtimex` `raidautorun` `fdflush`
 
-> Note: additional BusyBox applets (networking tools, archivers, daemons, and
+> Note: additional applets (networking tools, archivers, daemons, and
 > editors) are being added in later phases of the parity effort.
 
 ## Configuration (Kconfig)
@@ -412,8 +412,27 @@ The rootfs is configured with passwordless root login for testing. To set a root
 >
 > **Automated harness.** `qemu-test/run.sh <x86_64|arm64|arm32|riscv64>` builds
 > the target, packages a RustFS-only initramfs, boots it under `qemu-system-*`
-> (full-system, not qemu-user), runs ~121 applet tests in-guest and scores them.
+> (full-system, not qemu-user), runs the in-guest applet tests and scores them.
 > Results are written to `qemu-test/work/results-<arch>.txt`.
+>
+> **Full build matrix.** `qemu-test/run_matrix.sh [arch...]` boots every
+> combination of **{release, debug} × {static, shared}** for each architecture
+> under `qemu-system-*` and writes `qemu-test/work/MATRIX.txt`. Static images use
+> musl (x86_64/arm64/arm32) or glibc + `crt-static` (riscv64); shared images are
+> dynamically linked and the binary's glibc dependency closure (loader + libc +
+> libm + libgcc_s + libcrypt) is bundled into the initramfs automatically. Filter
+> with `RUN_LINKS=shared RUN_PROFILES=release qemu-test/run_matrix.sh arm64`.
+> Latest result — all four architectures, all four build modes:
+>
+> | Arch | release/static | debug/static | release/shared | debug/shared |
+> |------|:--:|:--:|:--:|:--:|
+> | x86_64  | 135/135 | 135/135 | 135/135 | 135/135 |
+> | arm64   | 135/135 | 135/135 | 135/135 | 135/135 |
+> | arm32   | 135/135 | 135/135 | 135/135 | 135/135 |
+> | riscv64 | 134/135 | 134/135 | 134/135 | 134/135 |
+>
+> (riscv64: the single non-pass is `devmem 0x0` reading an unmapped physical
+> address — an architecture/robustness edge case, not a build or link failure.)
 
 ### Testing with QEMU (x86_64)
 

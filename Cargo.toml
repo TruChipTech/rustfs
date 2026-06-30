@@ -5,7 +5,7 @@
 # Licensed under MIT
 [package]
 name = "rustfs"
-version = "1.2.0"
+version = "1.3.0"
 edition = "2021"
 description = "Rust-based rootfs utilities — safe, correct, and fast"
 license = "MIT"
@@ -71,6 +71,21 @@ unexpected_cfgs = { level = "allow", check-cfg = [
     'cfg(applet_flash_lock)', 'cfg(applet_flash_unlock)', 'cfg(applet_readprofile)',
     'cfg(applet_rtcwake)', 'cfg(applet_adjtimex)', 'cfg(applet_raidautorun)',
     'cfg(applet_fdflush)',
+    'cfg(applet_catv)',
+    'cfg(applet_more)',
+    'cfg(applet_run_parts)',
+    'cfg(applet_runlevel)',
+    'cfg(applet_pipe_progress)',
+    'cfg(applet_volname)',
+    'cfg(applet_mkpasswd)',
+    'cfg(applet_cryptpw)',
+    'cfg(applet_reset)',
+    'cfg(applet_beep)',
+    'cfg(applet_setarch)',
+    'cfg(applet_chvt)',
+    'cfg(applet_deallocvt)',
+    'cfg(applet_kbd_mode)',
+    'cfg(applet_rdate)',
 ] }
 
 [features]
